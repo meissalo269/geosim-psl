@@ -11,7 +11,7 @@ import { renderToDataUrl, wgs84Bounds } from "@/lib/raster";
 import { useClassColor } from "@/lib/geo-hooks";
 import { useGeo } from "@/lib/store";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/tableau-de-bord")({
   head: () => ({
     meta: [
       { property: "og:type", content: "website" },

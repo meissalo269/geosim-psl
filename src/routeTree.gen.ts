@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyseRouteImport } from './routes/analyse'
 import { Route as CarteRouteImport } from './routes/carte'
 import { Route as DonneesRouteImport } from './routes/donnees'
@@ -17,13 +16,9 @@ import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as RapportsRouteImport } from './routes/rapports'
 import { Route as SimulationRouteImport } from './routes/simulation'
+import { Route as TableauDeBordRouteImport } from './routes/tableau-de-bord'
 import { Route as ValidationRouteImport } from './routes/validation'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AnalyseRoute = AnalyseRouteImport.update({
   id: '/analyse',
   path: '/analyse',
@@ -59,6 +54,11 @@ const SimulationRoute = SimulationRouteImport.update({
   path: '/simulation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TableauDeBordRoute = TableauDeBordRouteImport.update({
+  id: '/tableau-de-bord',
+  path: '/tableau-de-bord',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ValidationRoute = ValidationRouteImport.update({
   id: '/validation',
   path: '/validation',
@@ -66,7 +66,6 @@ const ValidationRoute = ValidationRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
@@ -74,10 +73,10 @@ export interface FileRoutesByFullPath {
   '/parametres': typeof ParametresRoute
   '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
+  '/tableau-de-bord': typeof TableauDeBordRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
@@ -85,11 +84,11 @@ export interface FileRoutesByTo {
   '/parametres': typeof ParametresRoute
   '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
+  '/tableau-de-bord': typeof TableauDeBordRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
@@ -97,12 +96,12 @@ export interface FileRoutesById {
   '/parametres': typeof ParametresRoute
   '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
+  '/tableau-de-bord': typeof TableauDeBordRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/analyse'
     | '/carte'
     | '/donnees'
@@ -110,10 +109,10 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/rapports'
     | '/simulation'
+    | '/tableau-de-bord'
     | '/validation'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/analyse'
     | '/carte'
     | '/donnees'
@@ -121,10 +120,10 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/rapports'
     | '/simulation'
+    | '/tableau-de-bord'
     | '/validation'
   id:
     | '__root__'
-    | '/'
     | '/analyse'
     | '/carte'
     | '/donnees'
@@ -132,11 +131,11 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/rapports'
     | '/simulation'
+    | '/tableau-de-bord'
     | '/validation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AnalyseRoute: typeof AnalyseRoute
   CarteRoute: typeof CarteRoute
   DonneesRoute: typeof DonneesRoute
@@ -144,18 +143,12 @@ export interface RootRouteChildren {
   ParametresRoute: typeof ParametresRoute
   RapportsRoute: typeof RapportsRoute
   SimulationRoute: typeof SimulationRoute
+  TableauDeBordRoute: typeof TableauDeBordRoute
   ValidationRoute: typeof ValidationRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/analyse': {
       id: '/analyse'
       path: '/analyse'
@@ -205,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimulationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tableau-de-bord': {
+      id: '/tableau-de-bord'
+      path: '/tableau-de-bord'
+      fullPath: '/tableau-de-bord'
+      preLoaderRoute: typeof TableauDeBordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/validation': {
       id: '/validation'
       path: '/validation'
@@ -216,7 +216,6 @@ declare module '@tanstack/react-router' {
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AnalyseRoute: AnalyseRoute,
   CarteRoute: CarteRoute,
   DonneesRoute: DonneesRoute,
@@ -224,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   ParametresRoute: ParametresRoute,
   RapportsRoute: RapportsRoute,
   SimulationRoute: SimulationRoute,
+  TableauDeBordRoute: TableauDeBordRoute,
   ValidationRoute: ValidationRoute,
 }
 export const routeTree = rootRouteImport
