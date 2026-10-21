@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { DemoBadge, Notice, PageHeader, Panel, useRasters } from "@/components/geo/ui";
 import { checkCompatibility, extent, parseGeoTiff } from "@/lib/raster";
 import { uid, useGeo, type Dataset } from "@/lib/store";
+import { loadPslInputs, pslInputs } from "@/lib/psl-inputs";
 
 export const Route = createFileRoute("/donnees")({
   head: () => ({
@@ -28,6 +29,20 @@ function DataPage() {
   const rasters = useRasters();
   const [busy, setBusy] = useState(false);
   const ref = rasters.find((r) => r.isReference) ?? rasters[0];
+
+  async function loadProvided() {
+    setBusy(true);
+    try {
+      const inputs = await loadPslInputs();
+      for (const d of inputs) {
+        if (datasets.some((existing) => existing.id === d.id)) updateDataset(d.id, d);
+        else addDataset(d);
+      }
+      log({ type: "Import", label: "Cartes PSL 2018, 2021, 2024 : fond exclu avec psl.zip", status: "terminé" });
+      toast.success("Trois cartes réelles et leur zone d’étude chargées.");
+    } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
+    finally { setBusy(false); }
+  }
 
   async function handleFiles(files: FileList | null) {
     if (!files) return;
@@ -72,6 +87,13 @@ function DataPage() {
     <div>
       <PageHeader title="Données géospatiales" subtitle="Import local, lecture des métadonnées et contrôle de compatibilité. Les fichiers restent dans votre navigateur pendant la session." />
       <div className="space-y-6 p-6">
+        <Panel title="Vos cartes PSL — fond exclu">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button disabled={busy} onClick={loadProvided}><Upload className="h-4 w-4" />Charger mes cartes PSL</Button>
+            {pslInputs.map(({ year, asset }) => <Button key={year} variant="outline" size="sm" asChild><a href={asset.url} download={asset.original_filename}>GeoTIFF {year}</a></Button>)}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">TerrSet · Random Forest · 2018 / 2021 / 2024 · Limite fournie : psl.zip · Extérieur : NoData −9999 · 91 202 pixels retenus par carte (8 208,18 ha).</p>
+        </Panel>
         <Panel title="Importer">
           <label className="grid-paper flex cursor-pointer flex-col items-center gap-2 rounded-md border-2 border-dashed border-border p-8 text-center hover:border-sky">
             <Upload className="h-7 w-7 text-sky" />
