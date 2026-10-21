@@ -33,9 +33,11 @@ interface Props {
   fitTo?: [[number, number], [number, number]] | null;
   syncRef?: React.MutableRefObject<Leaflet.Map | null>;
   mapRef?: React.MutableRefObject<Leaflet.Map | null>;
+  syncMap?: Leaflet.Map | null;
+  onReady?: (map: Leaflet.Map | null) => void;
 }
 
-export function MapView({ overlays = [], vectors = [], basemap = "osm", className, onClick, fitTo, syncRef, mapRef }: Props) {
+export function MapView({ overlays = [], vectors = [], basemap = "osm", className, onClick, fitTo, syncRef, mapRef, syncMap, onReady }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<Leaflet.Map | null>(null);
   const L = useRef<typeof Leaflet | null>(null);
@@ -56,12 +58,15 @@ export function MapView({ overlays = [], vectors = [], basemap = "osm", classNam
       m.on("click", (e) => clickRef.current?.(e.latlng.lat, e.latlng.lng));
       map.current = m;
       if (mapRef) mapRef.current = m;
+      onReady?.(m);
       setTick((t) => t + 1);
     });
     return () => {
       cancelled = true;
       map.current?.remove();
       map.current = null;
+      if (mapRef) mapRef.current = null;
+      onReady?.(null);
     };
   }, []);
 
@@ -90,10 +95,10 @@ export function MapView({ overlays = [], vectors = [], basemap = "osm", classNam
 
   useEffect(() => {
     if (fitTo && map.current) map.current.fitBounds(fitTo, { padding: [20, 20] });
-  }, [fitTo?.[0][0], fitTo?.[1][1], tick]);
+  }, [fitTo?.[0][0], fitTo?.[0][1], fitTo?.[1][0], fitTo?.[1][1], tick]);
 
   useEffect(() => {
-    const a = map.current, b = syncRef?.current;
+    const a = map.current, b = syncMap ?? syncRef?.current;
     if (!a || !b) return;
     let lock = false;
     const sync = (src: Leaflet.Map, dst: Leaflet.Map) => () => {
@@ -103,10 +108,11 @@ export function MapView({ overlays = [], vectors = [], basemap = "osm", classNam
       lock = false;
     };
     const f1 = sync(a, b), f2 = sync(b, a);
+    f2();
     a.on("move", f1);
     b.on("move", f2);
     return () => { a.off("move", f1); b.off("move", f2); };
-  }, [tick, syncRef?.current]);
+  }, [tick, syncMap, syncRef?.current]);
 
   return <div ref={el} className={className ?? "h-full w-full"} />;
 }

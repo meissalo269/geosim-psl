@@ -24,7 +24,7 @@ export function ChartPanel({ title, filename, demo, children, className, context
     } catch { toast.error("Le graphique n’a pas pu être exporté. Réessayez après son affichage complet."); }
     finally { setBusy(false); }
   }
-  return <Panel title={title} className={className} right={<div className="flex shrink-0 gap-1">
+  return <Panel title={title} className={className ?? ""} right={<div className="flex shrink-0 gap-1">
     {(["png", "svg"] as const).map((format) => <Button key={format} size="sm" variant="outline" disabled={busy} onClick={() => save(format)} aria-label={`Exporter ${title} en ${format.toUpperCase()}`}><Download className="mr-1 h-3 w-3" />{format.toUpperCase()}</Button>)}
   </div>}><div ref={ref} className="bg-card p-2 text-foreground">
     <h3 className="mb-1 text-sm font-semibold">GeoSim PSL · {title}</h3>

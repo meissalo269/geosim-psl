@@ -40,10 +40,12 @@ function Analyse() {
 
   function run() {
     if (!A || !B || blocking || a === b || sel.length < 2) return;
+    try {
     const result = computeChange(A.raster, B.raster, sel);
     if (!result.total) { toast.error("Aucun pixel valide commun pour les classes choisies."); return; }
     setChange({ sourceRaster: A.raster, id: uid(), fromName: A.name, toName: B.name, y1: A.year ?? 0, y2: B.year ?? 0, result, demo: !!(A.demo || B.demo), date: new Date().toISOString() });
     log({ type: "Analyse diachronique", label: `${A.year ?? "?"} → ${B.year ?? "?"} : ${fmtHa(result.changed)} ha modifiés`, status: "terminé" });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Analyse impossible."); }
   }
 
   const overlay = useMemo(() => {

@@ -35,7 +35,7 @@ export async function parseGeoTiff(buf: ArrayBuffer): Promise<RasterData> {
   }
   const [originX, originY] = img.getOrigin();
   const [rx, ry] = img.getResolution();
-  if (![originX, originY, rx, ry].every(Number.isFinite) || rx <= 0 || ry >= 0 || img.getFileDirectory().ModelTransformation) {
+  if (![originX, originY, rx, ry].every(Number.isFinite) || rx <= 0 || ry >= 0 || "ModelTransformation" in img.getFileDirectory()) {
     throw new Error("Géoréférencement non pris en charge : une grille nord en haut sans rotation est requise. Réalignez le raster avant import.");
   }
   const geoKeys = img.getGeoKeys() ?? {};

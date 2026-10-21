@@ -60,7 +60,7 @@ function Settings() {
           <div className="flex gap-2"><Input type="number" placeholder="ex. 2015" value={y} onChange={(e) => setY(e.target.value)} className="w-32" /><Button variant="outline" onClick={() => { if (y) { addYear(Number(y)); setY(""); } }}>Ajouter</Button></div>
         </Panel>
         <Panel title="Moteur de traitement Python" className="xl:col-span-2">
-          <Notice title="Non configuré">Les traitements lourds (alignement, reprojection, CA-Markov, apprentissage automatique, export GeoTIFF) nécessitent une API FastAPI externe (Rasterio, GDAL, GeoPandas, NumPy, SciPy, scikit-learn) avec file de tâches. Endpoints spécifiés :</Notice>
+          <Notice title="Non configuré">Les traitements lourds (alignement, reprojection, CA-Markov avec aptitudes, apprentissage automatique) nécessitent une API FastAPI externe (Rasterio, GDAL, GeoPandas, NumPy, SciPy, scikit-learn) avec file de tâches. Markov spatial, CA-Markov simplifié et exports GeoTIFF sont disponibles localement. Endpoints spécifiés :</Notice>
           <table className="stat-num mt-3 w-full text-xs">{/* spec */}<tbody>{ENDPOINTS.map(([m, p, d]) => <tr key={p} className="border-t border-border"><td className="py-1.5 font-semibold text-accent">{m}</td><td>{p}</td><td className="font-sans text-muted-foreground">{d}</td></tr>)}</tbody></table>
         </Panel>
       </div>
