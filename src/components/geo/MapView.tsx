@@ -18,7 +18,7 @@ export interface VectorLayer {
 export const BASEMAPS = {
   osm: { label: "OpenStreetMap", url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", attr: "© OpenStreetMap" },
   satellite: { label: "Imagerie Esri", url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", attr: "© Esri" },
-  clair: { label: "Carto clair", url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", attr: "© CARTO © OSM" },
+  clair: { label: "Gris clair (Esri)", url: "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", attr: "© Esri" },
 } as const;
 export type BasemapKey = keyof typeof BASEMAPS;
 
