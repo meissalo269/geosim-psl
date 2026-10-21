@@ -12,6 +12,8 @@ import proj4 from "proj4";
 export const Route = createFileRoute("/carte")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Visualiseur cartographique — GeoSim PSL" },
       { name: "description", content: "Visualiser les cartes d'occupation du sol, gérer les couches et comparer deux dates." },
       { property: "og:title", content: "Visualiseur cartographique — GeoSim PSL" },
@@ -32,6 +34,7 @@ function Viewer() {
   const [compare, setCompare] = useState(false);
   const [left, setLeft] = useState(""); const [right, setRight] = useState("");
   const leftMap = useRef<Leaflet.Map | null>(null);
+  const [readyMap, setReadyMap] = useState<Leaflet.Map | null>(null);
 
   const images = useMemo(() => {
     if (typeof document === "undefined") return new Map<string, OverlayLayer>();
@@ -115,8 +118,8 @@ function Viewer() {
           <ClientOnly fallback={<div className="grid-paper h-full" />}>
             {compare ? (
               <div className="grid h-full grid-cols-2 gap-px bg-border">
-                <MapView key="l" mapRef={leftMap} basemap={basemap} overlays={left && images.get(left) ? [images.get(left)!] : []} fitTo={images.get(left)?.bounds ?? null} />
-                <MapView key="r" syncRef={leftMap} basemap={basemap} overlays={right && images.get(right) ? [images.get(right)!] : []} />
+                <MapView key="l" mapRef={leftMap} onReady={setReadyMap} basemap={basemap} overlays={left && images.get(left) ? [images.get(left)!] : []} fitTo={images.get(left)?.bounds ?? null} />
+                <MapView key="r" syncMap={readyMap} basemap={basemap} overlays={right && images.get(right) ? [images.get(right)!] : []} />
               </div>
             ) : (
               <MapView basemap={basemap} overlays={overlays} vectors={vectors} onClick={identify} fitTo={overlays.find((o) => o.visible)?.bounds ?? null} />

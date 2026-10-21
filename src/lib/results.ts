@@ -1,11 +1,14 @@
 import { create } from "zustand";
 import type { ChangeResult, ValidationResult } from "./analysis";
+import type { RasterData } from "./raster";
+import type { LulcClass } from "./store";
 
-export interface ChangeRun { id: string; fromName: string; toName: string; y1: number; y2: number; result: ChangeResult; demo: boolean; date: string }
+export interface ChangeRun { id: string; fromName: string; toName: string; y1: number; y2: number; result: ChangeResult; demo: boolean; date: string; sourceRaster?: RasterData }
 export interface SimRun {
   id: string; model: string; y1: number; y2: number; target: number; steps: number;
   codes: number[]; P: number[][]; start: number[]; predicted: number[]; warnings: string[]; demo: boolean; date: string;
   backtest?: { year: number; predicted: number[]; observed: number[] } | undefined;
+  raster?: RasterData; mapAreas?: number[]; legend?: LulcClass[]; seed?: number;
 }
 export interface ValRun { id: string; observed: string; predicted: string; year: number | null; result: ValidationResult; demo: boolean; date: string }
 

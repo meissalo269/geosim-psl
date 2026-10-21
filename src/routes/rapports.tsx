@@ -3,12 +3,16 @@ import { Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DemoBadge, Notice, PageHeader, Panel, fmtHa, fmtPct } from "@/components/geo/ui";
 import { download, exportMatrixCsv, toCsv } from "@/lib/analysis";
+import { exportGeoTiff } from "@/lib/raster-export";
+import { toast } from "sonner";
 import { useGeo } from "@/lib/store";
 import { useResults } from "@/lib/results";
 
 export const Route = createFileRoute("/rapports")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Rapports et exports — GeoSim PSL" },
       { name: "description", content: "Rapport synthétique imprimable en PDF et exports CSV des résultats calculés." },
       { property: "og:title", content: "Rapports et exports — GeoSim PSL" },
@@ -37,7 +41,7 @@ function Reports() {
             <Button variant="outline" disabled={!sim} onClick={() => sim && download("simulation.csv", toCsv([["Classe", "Initial (ha)", `${sim.target} (ha)`], ...sim.codes.map((c, i) => [name(c), sim.start[i].toFixed(2), sim.predicted[i].toFixed(2)])]))}><Download className="mr-1 h-4 w-4" />Simulation (CSV)</Button>
             <Button variant="outline" disabled={!validation} onClick={() => validation && download("validation.csv", toCsv([["Classe", "Producteur", "Utilisateur", "F1"], ...validation.result.perClass.map((c) => [name(c.code), c.producer.toFixed(4), c.user.toFixed(4), c.f1.toFixed(4)]), ["Précision globale", validation.result.overall.toFixed(4)], ["Kappa", validation.result.kappa.toFixed(4)]]))}><Download className="mr-1 h-4 w-4" />Validation (CSV)</Button>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">Export GeoTIFF et Shapefile : nécessite le moteur Python (GDAL), non configuré.</p>
+          <Button className="mt-3" variant="outline" disabled={!sim?.raster} onClick={() => { if (!sim?.raster) return; try { exportGeoTiff(sim.raster, `${sim.demo ? "FICTIF_" : ""}prediction_${sim.target}.tif`); } catch (e) { toast.error(e instanceof Error ? e.message : "Export impossible."); } }}><Download className="mr-1 h-4 w-4" />Carte prédite (GeoTIFF)</Button>
         </Panel>
 
         {none ? <Notice tone="info" title="Aucun résultat à inclure">Lancez une analyse diachronique, une simulation ou une validation.</Notice> : (
@@ -48,18 +52,19 @@ function Reports() {
               {demo && <p className="mt-2 flex items-center gap-2"><DemoBadge /> Ce rapport contient des résultats calculés sur des données fictives.</p>}
             </header>
             <section><h3 className="font-semibold text-primary">Données</h3>
-              <ul className="list-disc pl-5">{datasets.filter((d) => d.raster).map((d) => <li key={d.id}>{d.name} — {d.year ?? "année ?"}, EPSG:{d.raster!.epsg ?? "?"}, {d.raster!.width}×{d.raster!.height}, résolution {d.raster!.resX}</li>)}</ul></section>
+              <ul className="list-disc pl-5">{datasets.filter((d) => d.raster).map((d) => <li key={d.id}>{d.name} — {d.year ?? "année ?"}, EPSG:{d.raster?.epsg ?? "?"}, {d.raster?.width}×{d.raster?.height}, résolution {d.raster?.resX}</li>)}</ul></section>
             {change && <section><h3 className="font-semibold text-primary">Changements {change.y1}–{change.y2}</h3>
               <p>Surface analysée {fmtHa(change.result.total)} ha ; stable {fmtHa(change.result.stable)} ha ; modifiée {fmtHa(change.result.changed)} ha ({fmtPct(change.result.changed / change.result.total)}).</p>
               <table className="stat-num mt-2 w-full text-xs"><thead><tr><th className="text-left font-sans">Classe</th><th className="text-right">{change.y1}</th><th className="text-right">{change.y2}</th><th className="text-right">Net</th></tr></thead>
                 <tbody>{change.result.codes.map((c, i) => <tr key={c} className="border-t border-border"><td className="font-sans">{name(c)}</td><td className="text-right">{fmtHa(change.result.areaStart[i])}</td><td className="text-right">{fmtHa(change.result.areaEnd[i])}</td><td className="text-right">{fmtHa(change.result.areaEnd[i] - change.result.areaStart[i])}</td></tr>)}</tbody></table></section>}
             {sim && <section><h3 className="font-semibold text-primary">Simulation {sim.target}</h3>
               <p>Modèle : {sim.model}. Calibration {sim.y1}–{sim.y2}, {sim.steps.toFixed(2)} pas.</p>
-              <ul className="list-disc pl-5">{sim.codes.map((c, i) => <li key={c}>{name(c)} : {fmtHa(sim.predicted[i])} ha</li>)}</ul></section>}
+              <ul className="list-disc pl-5">{sim.warnings.map((w) => <li key={w}>{w}</li>)}</ul>
+              <ul className="list-disc pl-5">{sim.codes.map((c, i) => <li key={c}>{name(c)} : Markov théorique {fmtHa(sim.predicted[i])} ha · carte simulée {fmtHa(sim.mapAreas?.[i] ?? 0)} ha</li>)}</ul></section>}
             {validation && <section><h3 className="font-semibold text-primary">Validation</h3><p>{validation.predicted} vs {validation.observed} : précision globale {fmtPct(validation.result.overall)}, Kappa {validation.result.kappa.toFixed(3)}.</p></section>}
             {!validation && <p>Aucune validation indépendante : le modèle n'est pas validé.</p>}
             <section><h3 className="font-semibold text-primary">Limites méthodologiques</h3>
-              <p>La chaîne de Markov suppose des probabilités de transition stationnaires et ne spatialise pas les changements. Les résultats dépendent de la qualité des classifications d'entrée. Les projections éloignées de la période d'observation sont des scénarios tendanciels.</p></section>
+              <p>La chaîne de Markov suppose des probabilités historiques stationnaires. La carte est une réalisation stochastique ; CA-Markov simplifié ajoute un voisinage 3×3 sans cartes d’aptitude ni contraintes. Aucune prévision certaine n’est produite. Les résultats dépendent de la qualité des classifications d'entrée. Les projections éloignées de la période d'observation sont des scénarios tendanciels.</p></section>
           </article>
         )}
       </div>

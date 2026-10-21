@@ -2,6 +2,8 @@ import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Download, Play } from "lucide-react";
+import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/geo/MapView";
 import { DemoBadge, EmptyData, Notice, PageHeader, Panel, RasterSelect, Stat, fmtHa, fmtPct, useRasters } from "@/components/geo/ui";
@@ -13,6 +15,8 @@ import { useResults } from "@/lib/results";
 export const Route = createFileRoute("/analyse")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Analyse diachronique — GeoSim PSL" },
       { name: "description", content: "Matrice de transition, gains, pertes et carte des changements entre deux dates." },
       { property: "og:title", content: "Analyse diachronique — GeoSim PSL" },
@@ -35,21 +39,26 @@ function Analyse() {
   const names = (codes: number[]) => codes.map((c) => classes.find((k) => k.code === c)?.name ?? String(c));
 
   function run() {
-    if (!A || !B) return;
+    if (!A || !B || blocking || a === b || sel.length < 2) return;
+    try {
     const result = computeChange(A.raster, B.raster, sel);
-    setChange({ id: uid(), fromName: A.name, toName: B.name, y1: A.year ?? 0, y2: B.year ?? 0, result, demo: !!(A.demo || B.demo), date: new Date().toISOString() });
+    if (!result.total) { toast.error("Aucun pixel valide commun pour les classes choisies."); return; }
+    setChange({ sourceRaster: A.raster, id: uid(), fromName: A.name, toName: B.name, y1: A.year ?? 0, y2: B.year ?? 0, result, demo: !!(A.demo || B.demo), date: new Date().toISOString() });
     log({ type: "Analyse diachronique", label: `${A.year ?? "?"} → ${B.year ?? "?"} : ${fmtHa(result.changed)} ha modifiés`, status: "terminé" });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Analyse impossible."); }
   }
 
   const overlay = useMemo(() => {
-    if (!change || !A || typeof document === "undefined") return null;
+    if (!change || typeof document === "undefined") return null;
+    const source = change.sourceRaster;
+    if (!source) return null;
     const r = change.result;
-    const bounds = wgs84Bounds(A.raster);
+    const bounds = wgs84Bounds(source);
     if (!bounds) return null;
     const n = r.codes.length;
     const palette = ["#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe", "#008080", "#e6beff", "#9a6324", "#800000", "#aaffc3", "#808000"];
     const data = new Int32Array(mapMode === "change" ? r.changeMap : r.transitionMap);
-    const ras = finalize({ ...A.raster, data, nodata: 0 });
+    const ras = finalize({ ...source, data, nodata: 0 });
     const url = renderToDataUrl(ras, (v) => mapMode === "change" ? (v === 2 ? "#d64545" : "#dfe6ee") : ((v - 1) % (n + 1) === 0 ? null : palette[(v - 1) % palette.length]));
     return { id: "chg", url, bounds, opacity: 0.85, visible: true };
   }, [change, A, mapMode]);
@@ -59,7 +68,7 @@ function Analyse() {
   const r = change?.result;
   const nm = r ? names(r.codes) : [];
   const gl = r ? r.codes.map((_, i) => ({ classe: nm[i], Gains: +(r.areaEnd[i] - r.matrix[i][i]).toFixed(1), Pertes: -+(r.areaStart[i] - r.matrix[i][i]).toFixed(1) })) : [];
-  const ar = r ? r.codes.map((_, i) => ({ classe: nm[i], [String(change!.y1)]: +r.areaStart[i].toFixed(1), [String(change!.y2)]: +r.areaEnd[i].toFixed(1) })) : [];
+  const ar = r ? r.codes.map((_, i) => ({ classe: nm[i], [String(change?.y1)]: +r.areaStart[i].toFixed(1), [String(change?.y2)]: +r.areaEnd[i].toFixed(1) })) : [];
 
   return (
     <div>
@@ -109,12 +118,12 @@ function Analyse() {
                   </table>
                 </div>
               </Panel>
-              <Panel title="Superficies par année (ha)">
-                <div className="h-72"><ResponsiveContainer><BarChart data={ar}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend /><Bar dataKey={String(change.y1)} fill="var(--color-chart-5)" /><Bar dataKey={String(change.y2)} fill="var(--color-sky)" /></BarChart></ResponsiveContainer></div>
-              </Panel>
-              <Panel title="Gains et pertes (ha)">
-                <div className="h-72"><ResponsiveContainer><BarChart data={gl}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend /><ReferenceLine y={0} stroke="var(--color-foreground)" /><Bar dataKey="Gains" fill="var(--color-accent)" /><Bar dataKey="Pertes" fill="var(--color-destructive)" /></BarChart></ResponsiveContainer></div>
-              </Panel>
+              <ChartPanel title="Superficies par année (ha)" filename="superficies_analyse" demo={change.demo} context={`${change.y1}–${change.y2}`}>
+                <div className="h-72"><ResponsiveContainer><BarChart data={ar} margin={{ bottom: 40 }}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={10} interval={0} angle={-15} textAnchor="end" /><YAxis fontSize={11} /><Tooltip /><Legend content={<ChartLegend />} /><Bar isAnimationActive={false} dataKey={String(change.y1)} fill="var(--color-chart-5)" /><Bar isAnimationActive={false} dataKey={String(change.y2)} fill="var(--color-sky)" /></BarChart></ResponsiveContainer></div>
+              </ChartPanel>
+              <ChartPanel title="Gains et pertes (ha)" filename="gains_pertes" demo={change.demo} context={`${change.y1}–${change.y2}`}>
+                <div className="h-72"><ResponsiveContainer><BarChart data={gl} margin={{ bottom: 40 }}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={10} interval={0} angle={-15} textAnchor="end" /><YAxis fontSize={11} /><Tooltip /><Legend content={<ChartLegend />} /><ReferenceLine y={0} stroke="var(--color-foreground)" /><Bar isAnimationActive={false} dataKey="Gains" fill="var(--color-accent)" /><Bar isAnimationActive={false} dataKey="Pertes" fill="var(--color-destructive)" /></BarChart></ResponsiveContainer></div>
+              </ChartPanel>
             </div>
             <Panel title="Statistiques par classe">
               <table className="stat-num w-full text-sm">

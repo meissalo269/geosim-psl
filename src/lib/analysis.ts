@@ -1,4 +1,4 @@
-import { pixelAreaRow, type RasterData } from "./raster";
+import { checkCompatibility, pixelAreaRow, type RasterData } from "./raster";
 
 export interface ChangeResult {
   codes: number[];
@@ -18,6 +18,7 @@ export interface ChangeResult {
 const isND = (r: RasterData, v: number) => r.nodata !== null && v === r.nodata;
 
 export function computeChange(a: RasterData, b: RasterData, codes: number[]): ChangeResult {
+  assertInputs(a, b, codes);
   const n = codes.length;
   const idx = new Map(codes.map((c, i) => [c, i]));
   const matrix = Array.from({ length: n }, () => new Array(n).fill(0));
@@ -44,9 +45,9 @@ export function computeChange(a: RasterData, b: RasterData, codes: number[]): Ch
 }
 
 export function transitionProbabilities(matrix: number[][]): number[][] {
-  return matrix.map((r) => {
+  return matrix.map((r, i) => {
     const s = r.reduce((a, b) => a + b, 0);
-    return r.map((x) => (s > 0 ? x / s : 0));
+    return r.map((x, j) => (s > 0 ? x / s : i === j ? 1 : 0));
   });
 }
 
@@ -59,6 +60,7 @@ export function stepMarkov(v: number[], P: number[][]): number[] {
  * the remaining fraction is linearly interpolated between P^k and P^(k+1).
  */
 export function projectMarkov(start: number[], P: number[][], steps: number): number[] {
+  if (!Number.isFinite(steps) || steps < 0 || steps > 100) throw new Error("Le nombre de pas doit être compris entre 0 et 100.");
   const k = Math.floor(steps);
   let v = start.slice();
   for (let i = 0; i < k; i++) v = stepMarkov(v, P);
@@ -80,6 +82,7 @@ export interface ValidationResult {
 }
 
 export function computeValidation(observed: RasterData, predicted: RasterData, codes: number[]): ValidationResult {
+  assertInputs(observed, predicted, codes);
   const k = codes.length;
   const idx = new Map(codes.map((c, i) => [c, i]));
   const cm = Array.from({ length: k }, () => new Array(k).fill(0));
@@ -97,7 +100,7 @@ export function computeValidation(observed: RasterData, predicted: RasterData, c
   const rowS = cm.map((r) => r.reduce((a, b) => a + b, 0));
   const colS = codes.map((_, j) => cm.reduce((s, r) => s + r[j], 0));
   const pe = n ? rowS.reduce((s, r, i) => s + r * colS[i], 0) / (n * n) : 0;
-  const kappa = pe < 1 ? (overall - pe) / (1 - pe) : 0;
+  const kappa = pe < 1 ? (overall - pe) / (1 - pe) : Number.NaN;
   const perClass = codes.map((code, i) => {
     const producer = rowS[i] ? cm[i][i] / rowS[i] : 0;
     const user = colS[i] ? cm[i][i] / colS[i] : 0;
@@ -138,4 +141,10 @@ export function exportMatrixCsv(names: string[], matrix: number[][], file: strin
   const rows: (string | number)[][] = [["De \\ Vers (ha)", ...names, "Total"]];
   matrix.forEach((r, i) => rows.push([names[i], ...r.map((x) => x.toFixed(2)), r.reduce((a, b) => a + b, 0).toFixed(2)]));
   download(file, toCsv(rows));
+}
+
+function assertInputs(a: RasterData, b: RasterData, codes: number[]) {
+  const errors = checkCompatibility(a, b).filter((issue) => issue.level === "error");
+  if (errors.length) throw new Error(errors.map((issue) => issue.message).join(" "));
+  if (!codes.length || new Set(codes).size !== codes.length || codes.some((c) => !Number.isInteger(c))) throw new Error("La légende doit contenir des codes entiers uniques.");
 }

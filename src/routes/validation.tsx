@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Download, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DemoBadge, EmptyData, Notice, PageHeader, Panel, RasterSelect, Stat, fmtPct, useRasters } from "@/components/geo/ui";
@@ -11,6 +12,8 @@ import { useResults } from "@/lib/results";
 export const Route = createFileRoute("/validation")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Validation scientifique — GeoSim PSL" },
       { name: "description", content: "Matrice de confusion, précision globale, Kappa et F1 entre carte prédite et carte observée." },
       { property: "og:title", content: "Validation scientifique — GeoSim PSL" },
@@ -31,35 +34,38 @@ function Validation() {
   const names = classes.map((c) => c.name);
 
   function run() {
-    if (!O || !Pr) return;
+    if (!O || !Pr || blocking || o === p || !O.year || O.year !== Pr.year || O.isPrediction) return;
+    try {
     const result = computeValidation(O.raster, Pr.raster, classes.map((c) => c.code));
+    if (!result.n) { toast.error("Aucun pixel valide commun."); return; }
     setValidation({ id: uid(), observed: O.name, predicted: Pr.name, year: O.year, result, demo: !!(O.demo || Pr.demo), date: new Date().toISOString() });
     log({ type: "Validation", label: `${Pr.name} vs ${O.name} : OA ${fmtPct(result.overall)}, κ ${result.kappa.toFixed(3)}`, status: "terminé" });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Validation impossible."); }
   }
 
   if (rasters.length < 2) return (<div><PageHeader title="Validation scientifique" /><div className="p-6"><EmptyData message="Une carte observée et une carte prédite (même année) sont nécessaires." /></div></div>);
 
   return (
     <div>
-      <PageHeader title="Validation scientifique" subtitle="Comparaison pixel à pixel d'une carte prédite (produite par le moteur de simulation et importée) avec une carte observée indépendante." />
+      <PageHeader title="Validation scientifique" subtitle="Comparaison pixel à pixel d'une carte prédite (simulée ou importée) avec une carte observée indépendante." />
       <div className="space-y-6 p-6">
         <Panel title="Cartes à comparer">
           <div className="grid gap-4 md:grid-cols-2">
-            <RasterSelect label="Carte observée (référence)" value={o} onChange={setO} rasters={rasters} />
+            <RasterSelect label="Carte observée (référence)" value={o} onChange={setO} rasters={rasters.filter((r) => !r.isPrediction)} />
             <RasterSelect label="Carte prédite" value={p} onChange={setP} rasters={rasters} />
           </div>
           <div className="mt-4 space-y-2">
             {O && Pr && O.year !== Pr.year && <Notice title="Années différentes">Les deux cartes ne portent pas sur la même année ({O.year ?? "?"} / {Pr.year ?? "?"}). La comparaison ne constitue pas une validation.</Notice>}
             {issues.length > 0 && <Notice tone={blocking ? "error" : "warning"} title={blocking ? "Cartes non alignées" : "Avertissements"}><ul className="list-disc pl-4">{issues.map((i, k) => <li key={k}>{i.message}</li>)}</ul></Notice>}
           </div>
-          <Button className="mt-4" onClick={run} disabled={!O || !Pr || o === p || blocking}><Play className="mr-1 h-4 w-4" />Calculer les métriques</Button>
+          <Button className="mt-4" onClick={run} disabled={!O || !Pr || o === p || blocking || !O.year || O.year !== Pr.year}><Play className="mr-1 h-4 w-4" />Calculer les métriques</Button>
         </Panel>
         {v ? (
           <>
             {v.demo && <div className="flex items-center gap-2 text-sm"><DemoBadge /> Métriques calculées sur des données fictives.</div>}
             <div className="grid gap-4 sm:grid-cols-4">
               <Stat label="Précision globale" value={fmtPct(v.result.overall)} />
-              <Stat label="Kappa de Cohen" value={v.result.kappa.toFixed(3)} />
+              <Stat label="Kappa de Cohen" value={Number.isFinite(v.result.kappa) ? v.result.kappa.toFixed(3) : "Indéfini"} />
               <Stat label="Pixels comparés" value={v.result.n.toLocaleString("fr-FR")} hint="NoData exclus" />
               <Stat label="Année de référence" value={v.year ?? "?"} />
             </div>

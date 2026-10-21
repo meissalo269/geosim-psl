@@ -10,6 +10,8 @@ import { uid, useGeo, type Dataset } from "@/lib/store";
 export const Route = createFileRoute("/donnees")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Données géospatiales — GeoSim PSL" },
       { name: "description", content: "Import et vérification des rasters GeoTIFF et couches GeoJSON : CRS, emprise, résolution, NoData." },
       { property: "og:title", content: "Données géospatiales — GeoSim PSL" },
@@ -46,10 +48,13 @@ function DataPage() {
           addDataset({ ...base, kind: "raster", format: "GeoTIFF", raster, status, messages: msgs });
         } else if (ext === "geojson" || ext === "json") {
           const gj = JSON.parse(await f.text());
+          if (!isGeoJson(gj)) throw new Error("GeoJSON invalide : géométries et coordonnées WGS84 requises.");
           const n = gj.features?.length ?? 1;
           addDataset({ ...base, kind: "vecteur", format: "GeoJSON", geojson: gj, featureCount: n, status: "valide", messages: ["CRS supposé WGS84 (RFC 7946)."] });
         } else if (ext === "zip" || ext === "csv") {
           addDataset({ ...base, kind: "vecteur", format: ext === "zip" ? "Shapefile (ZIP)" : "CSV", status: "erreur", messages: ["Conversion non prise en charge dans le navigateur : nécessite le moteur Python (GeoPandas), non configuré."] });
+          log({ type: "Import", label: `Conversion indisponible : ${f.name}`, status: "erreur" });
+          continue;
         } else {
           throw new Error("Format non reconnu.");
         }
@@ -72,7 +77,7 @@ function DataPage() {
             <Upload className="h-7 w-7 text-sky" />
             <span className="font-medium text-primary">{busy ? "Lecture en cours…" : "Déposer ou choisir des fichiers"}</span>
             <span className="text-xs text-muted-foreground">GeoTIFF classifié (.tif, .tiff) · GeoJSON (.geojson, .json) · Shapefile ZIP et CSV : moteur Python requis</span>
-            <input type="file" multiple className="hidden" accept=".tif,.tiff,.geojson,.json,.zip,.csv" onChange={(e) => handleFiles(e.target.files)} />
+            <input type="file" multiple disabled={busy} className="hidden" accept=".tif,.tiff,.geojson,.json,.zip,.csv" onChange={(e) => { handleFiles(e.target.files); e.target.value = ""; }} />
           </label>
           <div className="mt-3 flex justify-end"><Button variant="ghost" size="sm" onClick={loadDemo}>Charger le jeu de démonstration (fictif)</Button></div>
         </Panel>
@@ -152,4 +157,25 @@ function DataPage() {
 function guessYear(name: string): number | null {
   const m = name.match(/(19|20)\d{2}/);
   return m ? Number(m[0]) : null;
+}
+
+function isGeoJson(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  if (v["type"] === "FeatureCollection") return Array.isArray(v["features"]) && v["features"].every((f) => !!f && typeof f === "object" && (f as Record<string, unknown>)["type"] === "Feature" && isGeoJson(f));
+  if (v["type"] === "Feature") return v["geometry"] === null || isGeoJson(v["geometry"]);
+  if (v["type"] === "GeometryCollection") return Array.isArray(v["geometries"]) && v["geometries"].every(isGeoJson);
+  const position = (c: unknown): boolean => Array.isArray(c) && c.length >= 2 && c.every((x) => typeof x === "number" && Number.isFinite(x)) && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
+  const line = (c: unknown): boolean => Array.isArray(c) && c.length >= 2 && c.every(position);
+  const ring = (c: unknown): boolean => Array.isArray(c) && c.length >= 4 && c.every(position) && JSON.stringify(c[0]) === JSON.stringify(c[c.length - 1]);
+  const polygon = (c: unknown): boolean => Array.isArray(c) && c.length > 0 && c.every(ring);
+  switch (v["type"]) {
+    case "Point": return position(v["coordinates"]);
+    case "MultiPoint": return Array.isArray(v["coordinates"]) && v["coordinates"].every(position);
+    case "LineString": return line(v["coordinates"]);
+    case "MultiLineString": return Array.isArray(v["coordinates"]) && v["coordinates"].every(line);
+    case "Polygon": return polygon(v["coordinates"]);
+    case "MultiPolygon": return Array.isArray(v["coordinates"]) && v["coordinates"].every(polygon);
+    default: return false;
+  }
 }

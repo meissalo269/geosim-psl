@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ClientOnly } from "@tanstack/react-router";
+import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
 import { Button } from "@/components/ui/button";
 import { MapView, type OverlayLayer } from "@/components/geo/MapView";
 import { DemoBadge, EmptyData, PageHeader, Panel, Stat, fmtHa, useRasters } from "@/components/geo/ui";
@@ -13,6 +14,8 @@ import { useGeo } from "@/lib/store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Tableau de bord — GeoSim PSL" },
       { name: "description", content: "Observatoire de l'occupation du sol de Port-Saint-Louis-du-Rhône : rasters, surfaces par classe et simulations." },
       { property: "og:title", content: "Tableau de bord — GeoSim PSL" },
@@ -79,7 +82,7 @@ function Dashboard() {
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{latest ? `Couche affichée : ${latest.name}` : "Limites de la zone d'étude non importées."}</p>
           </Panel>
-          <Panel title="Surfaces par classe (ha)" className="xl:col-span-2">
+          <ChartPanel title="Surfaces par classe (ha)" filename="surfaces_classes" demo={anyDemo} className="xl:col-span-2">
             {chart.length ? (
               <div className="h-[420px]">
                 <ResponsiveContainer>
@@ -88,13 +91,13 @@ function Dashboard() {
                     <XAxis dataKey="annee" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip formatter={(v) => `${fmtHa(Number(v))} ha`} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                    {classes.map((c) => <Bar key={c.code} dataKey={c.name} stackId="a" fill={c.color} />)}
+                    <Legend content={<ChartLegend />} />
+                    {classes.map((c) => <Bar isAnimationActive={false} key={c.code} dataKey={c.name} stackId="a" fill={c.color} />)}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             ) : <EmptyData />}
-          </Panel>
+          </ChartPanel>
         </div>
         <Panel title="Dernières simulations">
           {sims.length ? (
