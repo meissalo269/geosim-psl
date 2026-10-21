@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyseRouteImport } from './routes/analyse'
 import { Route as CarteRouteImport } from './routes/carte'
+import { Route as DocumentationRouteImport } from './routes/documentation'
 import { Route as DonneesRouteImport } from './routes/donnees'
 import { Route as HistoriqueRouteImport } from './routes/historique'
 import { Route as ParametresRouteImport } from './routes/parametres'
@@ -33,6 +34,11 @@ const AnalyseRoute = AnalyseRouteImport.update({
 const CarteRoute = CarteRouteImport.update({
   id: '/carte',
   path: '/carte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentationRoute = DocumentationRouteImport.update({
+  id: '/documentation',
+  path: '/documentation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DonneesRoute = DonneesRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
+  '/documentation': typeof DocumentationRoute
   '/donnees': typeof DonneesRoute
   '/historique': typeof HistoriqueRoute
   '/parametres': typeof ParametresRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
+  '/documentation': typeof DocumentationRoute
   '/donnees': typeof DonneesRoute
   '/historique': typeof HistoriqueRoute
   '/parametres': typeof ParametresRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
+  '/documentation': typeof DocumentationRoute
   '/donnees': typeof DonneesRoute
   '/historique': typeof HistoriqueRoute
   '/parametres': typeof ParametresRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analyse'
     | '/carte'
+    | '/documentation'
     | '/donnees'
     | '/historique'
     | '/parametres'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analyse'
     | '/carte'
+    | '/documentation'
     | '/donnees'
     | '/historique'
     | '/parametres'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/analyse'
     | '/carte'
+    | '/documentation'
     | '/donnees'
     | '/historique'
     | '/parametres'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyseRoute: typeof AnalyseRoute
   CarteRoute: typeof CarteRoute
+  DocumentationRoute: typeof DocumentationRoute
   DonneesRoute: typeof DonneesRoute
   HistoriqueRoute: typeof HistoriqueRoute
   ParametresRoute: typeof ParametresRoute
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/carte'
       fullPath: '/carte'
       preLoaderRoute: typeof CarteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documentation': {
+      id: '/documentation'
+      path: '/documentation'
+      fullPath: '/documentation'
+      preLoaderRoute: typeof DocumentationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/donnees': {
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyseRoute: AnalyseRoute,
   CarteRoute: CarteRoute,
+  DocumentationRoute: DocumentationRoute,
   DonneesRoute: DonneesRoute,
   HistoriqueRoute: HistoriqueRoute,
   ParametresRoute: ParametresRoute,
