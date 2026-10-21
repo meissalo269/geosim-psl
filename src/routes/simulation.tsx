@@ -48,6 +48,7 @@ function Simulation() {
     if (!y1 || !y2) errors.push("Associez une année à chaque carte sur la page Données.");
     else if (y2 <= y1) errors.push("La seconde date doit être postérieure à la première.");
     else if (!Number.isInteger(target) || target <= y2) errors.push(`L’année cible doit être un entier postérieur à ${y2}.`);
+    else if (target > MAX_TARGET) errors.push(`L’horizon de prédiction est limité à ${MAX_TARGET} (au-delà, l’extrapolation n’est pas scientifiquement justifiable).`);
     if ([A, B].some((r) => r.raster.uniques.some((u) => !codes.includes(u.value)))) errors.push("Des valeurs des cartes sont absentes de la légende. Corrigez les classes avant simulation.");
   }
   if (!Number.isInteger(seed) || seed < 1 || seed > 2147483646) errors.push("La graine doit être un entier entre 1 et 2147483646.");

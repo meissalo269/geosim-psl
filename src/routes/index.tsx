@@ -74,7 +74,7 @@ function Home() {
     </section>
     <section className="border-b border-border bg-card px-6 py-5 md:px-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div><p className="text-sm font-medium">2018 → 2021 → 2024 <span className="text-accent">→ 2034</span></p><p className="mt-1 text-xs text-muted-foreground">Observations historiques · Horizon exploratoire configurable</p></div>
+        <div><p className="text-sm font-medium">2018 → 2021 → 2024 <span className="text-accent">→ 2030</span></p><p className="mt-1 text-xs text-muted-foreground">Observations historiques · Horizon exploratoire 2030</p></div>
         <div className="flex flex-wrap gap-2"><Button onClick={load} disabled={busy} variant="outline"><Database className="h-4 w-4" />{busy ? "Chargement…" : "Charger mes cartes PSL"}</Button><Button asChild variant="outline"><Link to="/carte">Explorer la carte <ArrowRight className="h-4 w-4" /></Link></Button><Button asChild><Link to="/analyse">Lancer une analyse <ArrowRight className="h-4 w-4" /></Link></Button><Button asChild variant="outline"><Link to="/simulation">Accéder aux simulations</Link></Button></div>
       </div>
       {selected && <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-xs">{classes.map((c) => <span key={c.code} className="flex items-center gap-2"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill={c.color} /></svg>{c.name}</span>)}</div>}
