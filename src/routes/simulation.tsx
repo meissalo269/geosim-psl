@@ -31,7 +31,8 @@ function Simulation() {
   const { classes, addDataset, log } = useGeo();
   const { sim, setSim } = useResults();
   const [a, setA] = useState(""); const [b, setB] = useState("");
-  const [target, setTarget] = useState(2034);
+  const [target, setTarget] = useState(2030);
+  const MAX_TARGET = 2030;
   const [model, setModel] = useState<SpatialModel | "ml">("markov");
   const [seed, setSeed] = useState(42);
   const [busy, setBusy] = useState(false); const [progress, setProgress] = useState(0);

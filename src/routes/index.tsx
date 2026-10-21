@@ -14,7 +14,7 @@ import boundaryAsset from "@/assets/psl-boundary.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
     { title: "GeoSim PSL — Observer, analyser et anticiper" },
-    { name: "description", content: "Plateforme WebSIG scientifique de Port-Saint-Louis-du-Rhône. Classifications 2018, 2021, 2024 et scénarios exploratoires à l’horizon 2034." },
+    { name: "description", content: "Plateforme WebSIG scientifique de Port-Saint-Louis-du-Rhône. Classifications 2018, 2021, 2024 et scénarios exploratoires à l’horizon 2030." },
     { property: "og:title", content: "GeoSim PSL — Observatoire de Port-Saint-Louis-du-Rhône" },
     { property: "og:description", content: "Cartographie, analyse des transitions et simulation spatiale par Cheikh Ahmed Fadel Keita et Meïssa Lo." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
