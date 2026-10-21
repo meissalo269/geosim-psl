@@ -119,3 +119,17 @@ export function download(name: string, content: string | Blob, type = "text/csv;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
+
+/** Area (ha) per pixel value, honouring NoData and geographic CRS. */
+export function classAreas(r: RasterData): Map<number, number> {
+  const m = new Map<number, number>();
+  for (let row = 0; row < r.height; row++) {
+    const ha = pixelAreaRow(r, row) / 10000;
+    for (let col = 0; col < r.width; col++) {
+      const v = r.data[row * r.width + col];
+      if (isND(r, v)) continue;
+      m.set(v, (m.get(v) ?? 0) + ha);
+    }
+  }
+  return m;
+}
