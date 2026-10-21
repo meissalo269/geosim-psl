@@ -33,3 +33,8 @@ export function ChartPanel({ title, filename, demo, children, className, context
     {children}
   </div></Panel>;
 }
+export function ChartLegend({ payload }: { payload?: readonly { value?: string; color?: string }[] }) {
+  return <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-3 text-xs">
+    {payload?.map((entry, i) => <span key={i} className="inline-flex items-center gap-1 whitespace-nowrap"><span className="h-2.5 w-2.5 shrink-0" style={{ background: entry.color }} />{entry.value}</span>)}
+  </div>;
+}

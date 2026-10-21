@@ -2,7 +2,7 @@ import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Download, Play } from "lucide-react";
-import { ChartPanel } from "@/components/geo/ChartPanel";
+import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/geo/MapView";
@@ -119,10 +119,10 @@ function Analyse() {
                 </div>
               </Panel>
               <ChartPanel title="Superficies par année (ha)" filename="superficies_analyse" demo={change.demo} context={`${change.y1}–${change.y2}`}>
-                <div className="h-72"><ResponsiveContainer><BarChart data={ar}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend /><Bar isAnimationActive={false} dataKey={String(change.y1)} fill="var(--color-chart-5)" /><Bar isAnimationActive={false} dataKey={String(change.y2)} fill="var(--color-sky)" /></BarChart></ResponsiveContainer></div>
+                <div className="h-72"><ResponsiveContainer><BarChart data={ar}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend content={<ChartLegend />} /><Bar isAnimationActive={false} dataKey={String(change.y1)} fill="var(--color-chart-5)" /><Bar isAnimationActive={false} dataKey={String(change.y2)} fill="var(--color-sky)" /></BarChart></ResponsiveContainer></div>
               </ChartPanel>
               <ChartPanel title="Gains et pertes (ha)" filename="gains_pertes" demo={change.demo} context={`${change.y1}–${change.y2}`}>
-                <div className="h-72"><ResponsiveContainer><BarChart data={gl}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend /><ReferenceLine y={0} stroke="var(--color-foreground)" /><Bar isAnimationActive={false} dataKey="Gains" fill="var(--color-accent)" /><Bar isAnimationActive={false} dataKey="Pertes" fill="var(--color-destructive)" /></BarChart></ResponsiveContainer></div>
+                <div className="h-72"><ResponsiveContainer><BarChart data={gl}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={11} /><YAxis fontSize={11} /><Tooltip /><Legend content={<ChartLegend />} /><ReferenceLine y={0} stroke="var(--color-foreground)" /><Bar isAnimationActive={false} dataKey="Gains" fill="var(--color-accent)" /><Bar isAnimationActive={false} dataKey="Pertes" fill="var(--color-destructive)" /></BarChart></ResponsiveContainer></div>
               </ChartPanel>
             </div>
             <Panel title="Statistiques par classe">

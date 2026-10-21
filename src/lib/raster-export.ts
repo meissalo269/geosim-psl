@@ -6,6 +6,7 @@ import type { LulcClass } from "./store";
 export function rasterGeoTiff(r: RasterData): ArrayBuffer {
   if (!r.epsg) throw new Error("CRS inconnu : export géoréférencé impossible.");
   const geographic = r.epsg === 4326;
+  // Writer supports unsigned buffers only; preserve signed two’s-complement bits with SampleFormat 2.
   return writeArrayBuffer(Uint32Array.from(r.data), {
     width: r.width, height: r.height, BitsPerSample: [32], SampleFormat: [2],
     SamplesPerPixel: [1], PhotometricInterpretation: 1,

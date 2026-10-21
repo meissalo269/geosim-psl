@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapView } from "@/components/geo/MapView";
-import { ChartPanel } from "@/components/geo/ChartPanel";
+import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
 import { DemoBadge, EmptyData, Notice, PageHeader, Panel, RasterSelect, Stat, fmtHa, fmtPct, useRasters } from "@/components/geo/ui";
 import { classAreas, computeChange, download, projectMarkov, toCsv, transitionProbabilities } from "@/lib/analysis";
 import { checkCompatibility, renderToDataUrl, wgs84Bounds } from "@/lib/raster";
@@ -126,7 +126,7 @@ function SimResult({ s }: { s: SimRun }) {
       <div className="mt-3 flex flex-wrap gap-4">{legend.map((c) => <span key={c.code} className="flex items-center gap-2 text-xs"><span className="h-3 w-4" style={{ background: c.color }} />{c.name}</span>)}</div>
     </Panel>}
     <ChartPanel title="Superficies observées et projetées (ha)" filename={`superficies_${s.target}`} demo={s.demo} context={`${s.model} · calibration ${s.y1}–${s.y2} · cible ${s.target} · graine ${s.seed} · scénario non validé`}>
-      <div className="h-80"><ResponsiveContainer><BarChart data={data} margin={{ bottom: 45 }}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={10} interval={0} angle={-15} textAnchor="end" /><YAxis fontSize={11} /><Tooltip /><Legend /><Bar dataKey="Observé" fill="var(--color-chart-5)" isAnimationActive={false} /><Bar dataKey="Markov théorique" fill="var(--color-sky)" isAnimationActive={false} /><Bar dataKey="Carte simulée" fill="var(--color-accent)" isAnimationActive={false} /></BarChart></ResponsiveContainer></div>
+      <div className="h-80"><ResponsiveContainer><BarChart data={data} margin={{ bottom: 45 }}><CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" /><XAxis dataKey="classe" fontSize={10} interval={0} angle={-15} textAnchor="end" /><YAxis fontSize={11} /><Tooltip /><Legend content={<ChartLegend />} /><Bar dataKey="Observé" fill="var(--color-chart-5)" isAnimationActive={false} /><Bar dataKey="Markov théorique" fill="var(--color-sky)" isAnimationActive={false} /><Bar dataKey="Carte simulée" fill="var(--color-accent)" isAnimationActive={false} /></BarChart></ResponsiveContainer></div>
     </ChartPanel>
     <Panel title={`Probabilités historiques (${s.y1}→${s.y2})`} right={<Button size="sm" variant="outline" onClick={() => download(`${file}.csv`, toCsv([[s.model, `Calibration ${s.y1}–${s.y2}`, `Graine ${s.seed}`, s.demo ? "FICTIF" : "Scénario non validé"], ["Classe", `${s.y2} (ha)`, `${s.target} théorique (ha)`, `${s.target} carte (ha)`], ...s.codes.map((_, i) => [names[i], s.start[i], s.predicted[i], s.mapAreas?.[i] ?? ""])]))}><Download className="mr-1 h-3 w-3" />CSV</Button>}>
       <div className="overflow-x-auto"><table className="stat-num w-full text-xs"><thead><tr><th />{names.map((n) => <th key={n} className="p-2 text-right font-sans">{n}</th>)}</tr></thead><tbody>{s.P.map((row, i) => <tr key={i} className="border-t border-border"><td className="p-2 font-sans">{names[i]}</td>{row.map((p, j) => <td key={j} className="p-2 text-right">{p.toFixed(3)}</td>)}</tr>)}</tbody></table></div>

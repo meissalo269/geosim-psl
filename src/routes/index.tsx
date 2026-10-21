@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ClientOnly } from "@tanstack/react-router";
-import { ChartPanel } from "@/components/geo/ChartPanel";
+import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
 import { Button } from "@/components/ui/button";
 import { MapView, type OverlayLayer } from "@/components/geo/MapView";
 import { DemoBadge, EmptyData, PageHeader, Panel, Stat, fmtHa, useRasters } from "@/components/geo/ui";
@@ -91,7 +91,7 @@ function Dashboard() {
                     <XAxis dataKey="annee" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip formatter={(v) => `${fmtHa(Number(v))} ha`} />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Legend content={<ChartLegend />} />
                     {classes.map((c) => <Bar isAnimationActive={false} key={c.code} dataKey={c.name} stackId="a" fill={c.color} />)}
                   </BarChart>
                 </ResponsiveContainer>
