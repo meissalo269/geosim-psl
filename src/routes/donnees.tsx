@@ -40,7 +40,7 @@ function DataPage() {
       }
       log({ type: "Import", label: "Cartes PSL 2018, 2021, 2024 : fond exclu avec psl.zip", status: "terminé" });
       toast.success("Trois cartes réelles et leur zone d’étude chargées.");
-    } catch (e) { toast.error(e instanceof Error ? e.message : String(e)); }
+    } catch (e) { console.error("PSL-LOAD-ERROR", e); toast.error(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   }
 
