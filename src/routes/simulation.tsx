@@ -67,7 +67,7 @@ function Simulation() {
       const startAreas = classAreas(B.raster);
       const start = codes.map((c) => startAreas.get(c) ?? 0);
       const predicted = projectMarkov(start, P, steps);
-      const warnings = ["Scénario non validé : probabilités historiques supposées stationnaires. La carte est une réalisation stochastique, pas une prévision certaine.", "Les quantités théoriques et les superficies de la carte peuvent différer : aucun quota spatial exact n’est imposé."];
+      const warnings: string[] = [];
       if (far) warnings.push(`Extrapolation élevée : ${target - y2} ans pour ${interval} ans de calibration.`);
       if (!Number.isInteger(steps)) warnings.push("Quantités : interpolation entre deux pas. Carte : transition fractionnaire sur le dernier pas ; les deux méthodes peuvent différer.");
       if (ch.matrix.some((r) => r.every((v) => v === 0))) warnings.push("Classe absente à t1 : maintien de sa classe par défaut, faute de transitions observées.");
