@@ -162,20 +162,20 @@ function guessYear(name: string): number | null {
 function isGeoJson(value: unknown): boolean {
   if (!value || typeof value !== "object") return false;
   const v = value as Record<string, unknown>;
-  if (v.type === "FeatureCollection") return Array.isArray(v.features) && v.features.every((f) => !!f && typeof f === "object" && (f as Record<string, unknown>).type === "Feature" && isGeoJson(f));
-  if (v.type === "Feature") return v.geometry === null || isGeoJson(v.geometry);
-  if (v.type === "GeometryCollection") return Array.isArray(v.geometries) && v.geometries.every(isGeoJson);
+  if (v["type"] === "FeatureCollection") return Array.isArray(v["features"]) && v["features"].every((f) => !!f && typeof f === "object" && (f as Record<string, unknown>)["type"] === "Feature" && isGeoJson(f));
+  if (v["type"] === "Feature") return v["geometry"] === null || isGeoJson(v["geometry"]);
+  if (v["type"] === "GeometryCollection") return Array.isArray(v["geometries"]) && v["geometries"].every(isGeoJson);
   const position = (c: unknown): boolean => Array.isArray(c) && c.length >= 2 && c.every((x) => typeof x === "number" && Number.isFinite(x)) && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
   const line = (c: unknown): boolean => Array.isArray(c) && c.length >= 2 && c.every(position);
   const ring = (c: unknown): boolean => Array.isArray(c) && c.length >= 4 && c.every(position) && JSON.stringify(c[0]) === JSON.stringify(c[c.length - 1]);
   const polygon = (c: unknown): boolean => Array.isArray(c) && c.length > 0 && c.every(ring);
-  switch (v.type) {
-    case "Point": return position(v.coordinates);
-    case "MultiPoint": return Array.isArray(v.coordinates) && v.coordinates.every(position);
-    case "LineString": return line(v.coordinates);
-    case "MultiLineString": return Array.isArray(v.coordinates) && v.coordinates.every(line);
-    case "Polygon": return polygon(v.coordinates);
-    case "MultiPolygon": return Array.isArray(v.coordinates) && v.coordinates.every(polygon);
+  switch (v["type"]) {
+    case "Point": return position(v["coordinates"]);
+    case "MultiPoint": return Array.isArray(v["coordinates"]) && v["coordinates"].every(position);
+    case "LineString": return line(v["coordinates"]);
+    case "MultiLineString": return Array.isArray(v["coordinates"]) && v["coordinates"].every(line);
+    case "Polygon": return polygon(v["coordinates"]);
+    case "MultiPolygon": return Array.isArray(v["coordinates"]) && v["coordinates"].every(polygon);
     default: return false;
   }
 }
