@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - tsconfig: noUncheckedIndexedAccess disabled — raster/matrix code indexes typed arrays heavily.
+- vite optimizeDeps.include lists runtime libs (slider, leaflet, geotiff…) — lazy optimization caused duplicate React chunks and blank pages.
