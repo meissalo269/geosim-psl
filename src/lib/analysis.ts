@@ -133,3 +133,9 @@ export function classAreas(r: RasterData): Map<number, number> {
   }
   return m;
 }
+
+export function exportMatrixCsv(names: string[], matrix: number[][], file: string) {
+  const rows: (string | number)[][] = [["De \\ Vers (ha)", ...names, "Total"]];
+  matrix.forEach((r, i) => rows.push([names[i], ...r.map((x) => x.toFixed(2)), r.reduce((a, b) => a + b, 0).toFixed(2)]));
+  download(file, toCsv(rows));
+}

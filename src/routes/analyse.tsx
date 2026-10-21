@@ -5,7 +5,7 @@ import { Download, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MapView } from "@/components/geo/MapView";
 import { DemoBadge, EmptyData, Notice, PageHeader, Panel, RasterSelect, Stat, fmtHa, fmtPct, useRasters } from "@/components/geo/ui";
-import { computeChange, download, toCsv } from "@/lib/analysis";
+import { computeChange, exportMatrixCsv } from "@/lib/analysis";
 import { checkCompatibility, finalize, renderToDataUrl, wgs84Bounds } from "@/lib/raster";
 import { uid, useGeo } from "@/lib/store";
 import { useResults } from "@/lib/results";
@@ -21,12 +21,6 @@ export const Route = createFileRoute("/analyse")({
   }),
   component: Analyse,
 });
-
-export function exportMatrixCsv(names: string[], matrix: number[][], file: string) {
-  const rows: (string | number)[][] = [["De \\ Vers (ha)", ...names, "Total"]];
-  matrix.forEach((r, i) => rows.push([names[i], ...r.map((x) => x.toFixed(2)), r.reduce((a, b) => a + b, 0).toFixed(2)]));
-  download(file, toCsv(rows));
-}
 
 function Analyse() {
   const rasters = useRasters();

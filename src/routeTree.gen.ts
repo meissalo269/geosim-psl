@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyseRouteImport } from './routes/analyse'
 import { Route as CarteRouteImport } from './routes/carte'
 import { Route as DonneesRouteImport } from './routes/donnees'
+import { Route as SimulationRouteImport } from './routes/simulation'
+import { Route as ValidationRouteImport } from './routes/validation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +36,32 @@ const DonneesRoute = DonneesRouteImport.update({
   path: '/donnees',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SimulationRoute = SimulationRouteImport.update({
+  id: '/simulation',
+  path: '/simulation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ValidationRoute = ValidationRouteImport.update({
+  id: '/validation',
+  path: '/validation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/simulation': typeof SimulationRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/simulation': typeof SimulationRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +69,23 @@ export interface FileRoutesById {
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/simulation': typeof SimulationRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analyse' | '/carte' | '/donnees'
+  fullPaths:
+    '/' | '/analyse' | '/carte' | '/donnees' | '/simulation' | '/validation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyse' | '/carte' | '/donnees'
-  id: '__root__' | '/' | '/analyse' | '/carte' | '/donnees'
+  to: '/' | '/analyse' | '/carte' | '/donnees' | '/simulation' | '/validation'
+  id:
+    | '__root__'
+    | '/'
+    | '/analyse'
+    | '/carte'
+    | '/donnees'
+    | '/simulation'
+    | '/validation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +93,8 @@ export interface RootRouteChildren {
   AnalyseRoute: typeof AnalyseRoute
   CarteRoute: typeof CarteRoute
   DonneesRoute: typeof DonneesRoute
+  SimulationRoute: typeof SimulationRoute
+  ValidationRoute: typeof ValidationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +127,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DonneesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/simulation': {
+      id: '/simulation'
+      path: '/simulation'
+      fullPath: '/simulation'
+      preLoaderRoute: typeof SimulationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/validation': {
+      id: '/validation'
+      path: '/validation'
+      fullPath: '/validation'
+      preLoaderRoute: typeof ValidationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +149,8 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyseRoute: AnalyseRoute,
   CarteRoute: CarteRoute,
   DonneesRoute: DonneesRoute,
+  SimulationRoute: SimulationRoute,
+  ValidationRoute: ValidationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
