@@ -4,5 +4,5 @@
 - [x] Produire des cartes par Markov spatial et CA-Markov simplifié, avec limites explicites.
 - [x] Exporter les cartes prédites en PNG et GeoTIFF et les retrouver dans le visualiseur.
 - [x] Vérifier calculs, imports, exports et parcours de simulation dans l’application.
-- [ ] Vérifier la limite PSL et masquer le fond des trois cartes fournies.
-- [ ] Rendre les cartes masquées accessibles dans l’application et vérifier une simulation réelle.
+- [x] Vérifier la limite PSL et masquer le fond des trois cartes fournies.
+- [x] Rendre les cartes masquées accessibles dans l’application et vérifier une simulation réelle.
