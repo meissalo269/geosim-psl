@@ -13,10 +13,10 @@ export async function loadPslInputs(): Promise<Dataset[]> {
     const response = await fetch(asset.url);
     if (!response.ok) throw new Error(`Carte ${year} indisponible (${response.status}).`);
     const raster = await parseGeoTiff(await response.arrayBuffer());
-    return { id: `psl-real-${year}`, name: asset.original_filename, year, raster, size: asset.size, kind: "raster", format: "GeoTIFF", status: "valide", messages: ["Classification TerrSet / Random Forest fournie par Meissa Lo. Fond exclu selon psl.zip ; inclusion au centre du pixel. Entraînement CORINE 2018 : non indépendant pour la validation."], isReference: year === 2018, createdAt };
+    return { id: `psl-real-${year}`, name: asset.original_filename, year, raster, size: asset.size, kind: "raster", format: "GeoTIFF", status: "valide", messages: ["Classification TerrSet / Random Forest fournie par Meïssa Lo. Fond exclu selon psl.zip ; inclusion au centre du pixel. Entraînement CORINE 2018 : non indépendant pour la validation."], isReference: year === 2018, createdAt };
   }));
   const response = await fetch(boundary.url);
   if (!response.ok) throw new Error("Limite PSL indisponible.");
   const geojson = await response.json() as GeoJSON.FeatureCollection;
-  return [...rasters, { id: "psl-real-boundary", name: "Zone d’étude PSL", kind: "vecteur", format: "GeoJSON (depuis psl.zip)", size: boundary.size, year: null, geojson, featureCount: geojson.features.length, isStudyArea: true, status: "valide", messages: ["Limite WGS84 fournie par Meissa Lo."], createdAt }];
+  return [...rasters, { id: "psl-real-boundary", name: "Zone d’étude PSL", kind: "vecteur", format: "GeoJSON (depuis psl.zip)", size: boundary.size, year: null, geojson, featureCount: geojson.features.length, isStudyArea: true, status: "valide", messages: ["Limite WGS84 fournie par Meïssa Lo."], createdAt }];
 }
