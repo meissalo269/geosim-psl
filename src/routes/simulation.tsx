@@ -91,7 +91,7 @@ function Simulation() {
     <Panel title="Configuration"><fieldset disabled={busy} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <RasterSelect label="Carte de calibration t1" value={A?.id ?? ""} onChange={setA} rasters={historical} />
       <RasterSelect label="Carte de calibration t2 (carte initiale)" value={B?.id ?? ""} onChange={setB} rasters={historical} />
-      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Année cible</span><Input type="number" value={target} onChange={(e) => setTarget(Number(e.target.value))} /></label>
+      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Année cible (max 2030)</span><Input type="number" min={2024} max={MAX_TARGET} value={target} onChange={(e) => setTarget(Number(e.target.value))} /></label>
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Modèle</span><select className="h-9 w-full rounded-md border border-input bg-card px-2" value={model} onChange={(e) => setModel(e.target.value as SpatialModel | "ml")}><option value="markov">Markov spatial stochastique</option><option value="ca-markov">CA-Markov simplifié (3×3)</option><option value="ml">Apprentissage automatique</option></select></label>
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Graine aléatoire</span><Input type="number" min={1} max={2147483646} value={seed} onChange={(e) => setSeed(Number(e.target.value))} /></label>
     </fieldset>
