@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyseRouteImport } from './routes/analyse'
 import { Route as CarteRouteImport } from './routes/carte'
 import { Route as DonneesRouteImport } from './routes/donnees'
+import { Route as HistoriqueRouteImport } from './routes/historique'
+import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as RapportsRouteImport } from './routes/rapports'
 import { Route as SimulationRouteImport } from './routes/simulation'
 import { Route as ValidationRouteImport } from './routes/validation'
 
@@ -36,6 +39,21 @@ const DonneesRoute = DonneesRouteImport.update({
   path: '/donnees',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoriqueRoute = HistoriqueRouteImport.update({
+  id: '/historique',
+  path: '/historique',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RapportsRoute = RapportsRouteImport.update({
+  id: '/rapports',
+  path: '/rapports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimulationRoute = SimulationRouteImport.update({
   id: '/simulation',
   path: '/simulation',
@@ -52,6 +70,9 @@ export interface FileRoutesByFullPath {
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/historique': typeof HistoriqueRoute
+  '/parametres': typeof ParametresRoute
+  '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
   '/validation': typeof ValidationRoute
 }
@@ -60,6 +81,9 @@ export interface FileRoutesByTo {
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/historique': typeof HistoriqueRoute
+  '/parametres': typeof ParametresRoute
+  '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
   '/validation': typeof ValidationRoute
 }
@@ -69,21 +93,44 @@ export interface FileRoutesById {
   '/analyse': typeof AnalyseRoute
   '/carte': typeof CarteRoute
   '/donnees': typeof DonneesRoute
+  '/historique': typeof HistoriqueRoute
+  '/parametres': typeof ParametresRoute
+  '/rapports': typeof RapportsRoute
   '/simulation': typeof SimulationRoute
   '/validation': typeof ValidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/analyse' | '/carte' | '/donnees' | '/simulation' | '/validation'
+    | '/'
+    | '/analyse'
+    | '/carte'
+    | '/donnees'
+    | '/historique'
+    | '/parametres'
+    | '/rapports'
+    | '/simulation'
+    | '/validation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyse' | '/carte' | '/donnees' | '/simulation' | '/validation'
+  to:
+    | '/'
+    | '/analyse'
+    | '/carte'
+    | '/donnees'
+    | '/historique'
+    | '/parametres'
+    | '/rapports'
+    | '/simulation'
+    | '/validation'
   id:
     | '__root__'
     | '/'
     | '/analyse'
     | '/carte'
     | '/donnees'
+    | '/historique'
+    | '/parametres'
+    | '/rapports'
     | '/simulation'
     | '/validation'
   fileRoutesById: FileRoutesById
@@ -93,6 +140,9 @@ export interface RootRouteChildren {
   AnalyseRoute: typeof AnalyseRoute
   CarteRoute: typeof CarteRoute
   DonneesRoute: typeof DonneesRoute
+  HistoriqueRoute: typeof HistoriqueRoute
+  ParametresRoute: typeof ParametresRoute
+  RapportsRoute: typeof RapportsRoute
   SimulationRoute: typeof SimulationRoute
   ValidationRoute: typeof ValidationRoute
 }
@@ -127,6 +177,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DonneesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/historique': {
+      id: '/historique'
+      path: '/historique'
+      fullPath: '/historique'
+      preLoaderRoute: typeof HistoriqueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rapports': {
+      id: '/rapports'
+      path: '/rapports'
+      fullPath: '/rapports'
+      preLoaderRoute: typeof RapportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simulation': {
       id: '/simulation'
       path: '/simulation'
@@ -149,6 +220,9 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyseRoute: AnalyseRoute,
   CarteRoute: CarteRoute,
   DonneesRoute: DonneesRoute,
+  HistoriqueRoute: HistoriqueRoute,
+  ParametresRoute: ParametresRoute,
+  RapportsRoute: RapportsRoute,
   SimulationRoute: SimulationRoute,
   ValidationRoute: ValidationRoute,
 }
