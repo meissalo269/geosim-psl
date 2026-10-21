@@ -31,7 +31,8 @@ function Simulation() {
   const { classes, addDataset, log } = useGeo();
   const { sim, setSim } = useResults();
   const [a, setA] = useState(""); const [b, setB] = useState("");
-  const [target, setTarget] = useState(2034);
+  const [target, setTarget] = useState(2030);
+  const MAX_TARGET = 2030;
   const [model, setModel] = useState<SpatialModel | "ml">("markov");
   const [seed, setSeed] = useState(42);
   const [busy, setBusy] = useState(false); const [progress, setProgress] = useState(0);
@@ -47,6 +48,7 @@ function Simulation() {
     if (!y1 || !y2) errors.push("Associez une année à chaque carte sur la page Données.");
     else if (y2 <= y1) errors.push("La seconde date doit être postérieure à la première.");
     else if (!Number.isInteger(target) || target <= y2) errors.push(`L’année cible doit être un entier postérieur à ${y2}.`);
+    else if (target > MAX_TARGET) errors.push(`L’horizon de prédiction est limité à ${MAX_TARGET} (au-delà, l’extrapolation n’est pas scientifiquement justifiable).`);
     if ([A, B].some((r) => r.raster.uniques.some((u) => !codes.includes(u.value)))) errors.push("Des valeurs des cartes sont absentes de la légende. Corrigez les classes avant simulation.");
   }
   if (!Number.isInteger(seed) || seed < 1 || seed > 2147483646) errors.push("La graine doit être un entier entre 1 et 2147483646.");
@@ -89,7 +91,7 @@ function Simulation() {
     <Panel title="Configuration"><fieldset disabled={busy} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <RasterSelect label="Carte de calibration t1" value={A?.id ?? ""} onChange={setA} rasters={historical} />
       <RasterSelect label="Carte de calibration t2 (carte initiale)" value={B?.id ?? ""} onChange={setB} rasters={historical} />
-      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Année cible</span><Input type="number" value={target} onChange={(e) => setTarget(Number(e.target.value))} /></label>
+      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Année cible (max 2030)</span><Input type="number" min={2024} max={MAX_TARGET} value={target} onChange={(e) => setTarget(Number(e.target.value))} /></label>
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Modèle</span><select className="h-9 w-full rounded-md border border-input bg-card px-2" value={model} onChange={(e) => setModel(e.target.value as SpatialModel | "ml")}><option value="markov">Markov spatial stochastique</option><option value="ca-markov">CA-Markov simplifié (3×3)</option><option value="ml">Apprentissage automatique</option></select></label>
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Graine aléatoire</span><Input type="number" min={1} max={2147483646} value={seed} onChange={(e) => setSeed(Number(e.target.value))} /></label>
     </fieldset>
