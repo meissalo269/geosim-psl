@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { AlertTriangle, Database, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGeo, type Dataset } from "@/lib/store";
@@ -20,7 +20,7 @@ export function Panel({ title, children, className, right }: { title?: string; c
   return (
     <section className={`rounded-md border border-border bg-card ${className ?? ""}`}>
       {title && (
-        <header className="flex items-center justify-between border-b border-border px-4 py-2.5">
+        <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2.5">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h2>
           {right}
         </header>
@@ -71,7 +71,7 @@ export function DemoBadge() {
 
 export function useRasters() {
   const datasets = useGeo((s) => s.datasets);
-  return datasets.filter((d): d is Dataset & { raster: NonNullable<Dataset["raster"]> } => !!d.raster);
+  return useMemo(() => datasets.filter((d): d is Dataset & { raster: NonNullable<Dataset["raster"]> } => !!d.raster), [datasets]);
 }
 
 export function RasterSelect({ value, onChange, label, rasters }: { value: string; onChange: (v: string) => void; label: string; rasters: Dataset[] }) {
@@ -89,4 +89,4 @@ export function RasterSelect({ value, onChange, label, rasters }: { value: strin
 }
 
 export const fmtHa = (x: number) => x.toLocaleString("fr-FR", { maximumFractionDigits: 1 });
-export const fmtPct = (x: number) => (x * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " %";
+export const fmtPct = (x: number) => Number.isFinite(x) ? (x * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " %" : "—";

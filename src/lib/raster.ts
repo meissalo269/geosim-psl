@@ -35,6 +35,9 @@ export async function parseGeoTiff(buf: ArrayBuffer): Promise<RasterData> {
   }
   const [originX, originY] = img.getOrigin();
   const [rx, ry] = img.getResolution();
+  if (![originX, originY, rx, ry].every(Number.isFinite) || rx <= 0 || ry >= 0 || img.getFileDirectory().ModelTransformation) {
+    throw new Error("Géoréférencement non pris en charge : une grille nord en haut sans rotation est requise. Réalignez le raster avant import.");
+  }
   const geoKeys = img.getGeoKeys() ?? {};
   const epsg: number | null =
     (geoKeys.ProjectedCSTypeGeoKey as number) || (geoKeys.GeographicTypeGeoKey as number) || null;
@@ -43,7 +46,12 @@ export async function parseGeoTiff(buf: ArrayBuffer): Promise<RasterData> {
   const rasters = await img.readRasters({ samples: [0], interleave: true });
   const src = rasters as unknown as ArrayLike<number>;
   const data = new Int32Array(width * height);
-  for (let i = 0; i < data.length; i++) data[i] = Math.round(src[i]);
+  if (nd !== null && nd !== undefined && (!Number.isInteger(nd) || nd < -2147483648 || nd > 2147483647)) throw new Error("NoData doit être un entier signé sur 32 bits.");
+  for (let i = 0; i < data.length; i++) {
+    const v = src[i];
+    if (!Number.isInteger(v) || v < -2147483648 || v > 2147483647) throw new Error("Raster non catégoriel : chaque pixel doit être un code entier signé sur 32 bits.");
+    data[i] = v;
+  }
   return finalize({
     width, height, data, nodata: nd ?? null, epsg, originX, originY,
     resX: Math.abs(rx), resY: Math.abs(ry), geographic,
@@ -100,7 +108,8 @@ export function renderToDataUrl(r: RasterData, colorOf: (v: number) => string | 
   const c = document.createElement("canvas");
   c.width = r.width;
   c.height = r.height;
-  const ctx = c.getContext("2d")!;
+  const ctx = c.getContext("2d");
+  if (!ctx) throw new Error("Le navigateur ne permet pas de dessiner le raster.");
   const img = ctx.createImageData(r.width, r.height);
   const cache = new Map<number, [number, number, number] | null>();
   for (let i = 0; i < r.data.length; i++) {
@@ -130,8 +139,8 @@ export function checkCompatibility(a: RasterData, b: RasterData): CompatIssue[] 
   if (a.width !== b.width || a.height !== b.height) issues.push({ level: "error", message: `Dimensions différentes (${a.width}×${a.height} vs ${b.width}×${b.height}).` });
   const tol = Math.min(a.resX, b.resX) * 1e-6;
   if (Math.abs(a.resX - b.resX) > tol || Math.abs(a.resY - b.resY) > tol) issues.push({ level: "error", message: `Résolutions différentes (${a.resX} vs ${b.resX}). Rééchantillonnage au plus proche voisin requis.` });
-  if (Math.abs(a.originX - b.originX) > a.resX / 2 || Math.abs(a.originY - b.originY) > a.resY / 2) issues.push({ level: "error", message: "Emprises/origines non alignées." });
+  if (Math.abs(a.originX - b.originX) > tol || Math.abs(a.originY - b.originY) > tol) issues.push({ level: "error", message: "Emprises/origines non alignées." });
   if (a.nodata !== b.nodata) issues.push({ level: "warning", message: `Valeurs NoData différentes (${a.nodata} vs ${b.nodata}). Les deux seront exclues.` });
-  if (!a.epsg || !b.epsg) issues.push({ level: "warning", message: "Géoréférencement incomplet : CRS non détecté." });
+  if (!a.epsg || !b.epsg) issues.push({ level: "error", message: "Géoréférencement incomplet : CRS non détecté, comparaison impossible." });
   return issues;
 }

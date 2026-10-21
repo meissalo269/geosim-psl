@@ -18,6 +18,7 @@ export interface Dataset {
   demo?: boolean;
   isReference?: boolean;
   isStudyArea?: boolean;
+  isPrediction?: boolean;
   createdAt: string;
 }
 
@@ -56,7 +57,7 @@ export const useGeo = create<State>((set, get) => ({
   ],
   years: [2018, 2021, 2024],
   history: [],
-  addDataset: (d) => set((s) => ({ datasets: [...s.datasets, d] })),
+  addDataset: (d) => set((s) => ({ datasets: [...s.datasets, d], years: d.year ? [...new Set([...s.years, d.year])].sort() : s.years })),
   updateDataset: (id, patch) => set((s) => ({ datasets: s.datasets.map((d) => (d.id === id ? { ...d, ...patch } : d)) })),
   removeDataset: (id) => set((s) => ({ datasets: s.datasets.filter((d) => d.id !== id) })),
   setClasses: (classes) => set({ classes }),
