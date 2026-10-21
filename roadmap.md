@@ -6,3 +6,11 @@
 - [x] Vérifier calculs, imports, exports et parcours de simulation dans l’application.
 - [x] Vérifier la limite PSL et masquer le fond des trois cartes fournies.
 - [x] Rendre les cartes masquées accessibles dans l’application et vérifier une simulation réelle.
+
+# Nouveau cahier des charges — première étape
+- [ ] Créer l’accueil scientifique cartographique et conserver le tableau de bord sur sa propre page.
+- [ ] Ajouter l’identité des auteurs, le logo, les modes clair/sombre et la navigation rétractable.
+- [ ] Ajouter la documentation scientifique des fonctions disponibles et de leurs limites.
+- [ ] Vérifier les cartes, le chargement PSL, la navigation et les modes d’affichage.
+
+Étapes suivantes du cahier des charges : outils cartographiques avancés, télédétection continue et saisonnière, scénarios CA-Markov paramétrables, enrichissement du rapport et préparation d’un déploiement GitHub Pages vérifié. Elles ne sont pas incluses dans cette première étape.
