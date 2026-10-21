@@ -13,3 +13,4 @@
 - Spatial Markov runs as a seeded browser-side stochastic realization; CA-Markov uses a synchronous 3×3 neighborhood with smoothed weights, not suitability layers or exact area allocation, to keep the assumptions inspectable.
 - Generated prediction rasters enter the shared session dataset list and carry isPrediction; historical calibration excludes them to avoid using simulated observations.
 - Graph exports use ChartPanel to capture their titles and fictitious-data context; GeoTIFF exports preserve the categorical signed-integer grid and original georeferencing.
+- Provided historical PSL rasters are pre-masked by pixel-centre inclusion in the supplied WGS84 study polygon; retain the original grid, assign exterior NoData, and serve fixed inputs through asset pointers so all analyses exclude the exterior consistently.
