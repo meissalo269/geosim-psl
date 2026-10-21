@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       })}</nav>
       <div className="border-t border-sidebar-border p-3">
         <Button size="icon" variant="ghost" onClick={() => setDark(!dark)} aria-label={dark ? "Activer le mode clair" : "Activer le mode sombre"} title={dark ? "Mode clair" : "Mode sombre"} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</Button>
-        <p className={`mt-2 text-[11px] leading-relaxed text-sidebar-foreground/70 ${collapsed ? "lg:hidden" : ""}`}>Cheikh Ahmed Fadel Keita · Meïssa Lo<br />Master 1 Géomatique et Modélisation spatiale<br />Aix-Marseille Université</p>
+        <p className={`mt-2 text-[11px] leading-relaxed text-sidebar-foreground/70 ${collapsed ? "lg:hidden" : ""}`}>Cheikh Ahmed Fadel Keita et Meïssa Lo<br />Master 1 Géomatique et Modélisation spatiale<br />Aix-Marseille Université</p>
       </div>
     </aside>
     {open && <div className="fixed inset-0 z-[999] bg-foreground/40 lg:hidden" onClick={() => setOpen(false)} />}
