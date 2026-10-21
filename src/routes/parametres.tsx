@@ -9,6 +9,8 @@ import { useGeo } from "@/lib/store";
 export const Route = createFileRoute("/parametres")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Paramètres du projet — GeoSim PSL" },
       { name: "description", content: "Classes d'occupation du sol, codes, couleurs, années et moteur de traitement." },
       { property: "og:title", content: "Paramètres du projet — GeoSim PSL" },

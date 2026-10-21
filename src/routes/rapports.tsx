@@ -9,6 +9,8 @@ import { useResults } from "@/lib/results";
 export const Route = createFileRoute("/rapports")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Rapports et exports — GeoSim PSL" },
       { name: "description", content: "Rapport synthétique imprimable en PDF et exports CSV des résultats calculés." },
       { property: "og:title", content: "Rapports et exports — GeoSim PSL" },

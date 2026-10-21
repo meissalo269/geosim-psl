@@ -12,6 +12,8 @@ import proj4 from "proj4";
 export const Route = createFileRoute("/carte")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Visualiseur cartographique — GeoSim PSL" },
       { name: "description", content: "Visualiser les cartes d'occupation du sol, gérer les couches et comparer deux dates." },
       { property: "og:title", content: "Visualiseur cartographique — GeoSim PSL" },

@@ -5,6 +5,8 @@ import { useGeo } from "@/lib/store";
 export const Route = createFileRoute("/historique")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Historique des traitements — GeoSim PSL" },
       { name: "description", content: "Journal des imports, analyses, simulations et validations." },
       { property: "og:title", content: "Historique des traitements — GeoSim PSL" },

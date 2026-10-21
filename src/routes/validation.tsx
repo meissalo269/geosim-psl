@@ -11,6 +11,8 @@ import { useResults } from "@/lib/results";
 export const Route = createFileRoute("/validation")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Validation scientifique — GeoSim PSL" },
       { name: "description", content: "Matrice de confusion, précision globale, Kappa et F1 entre carte prédite et carte observée." },
       { property: "og:title", content: "Validation scientifique — GeoSim PSL" },

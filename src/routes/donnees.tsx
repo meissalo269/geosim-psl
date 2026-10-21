@@ -10,6 +10,8 @@ import { uid, useGeo, type Dataset } from "@/lib/store";
 export const Route = createFileRoute("/donnees")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Données géospatiales — GeoSim PSL" },
       { name: "description", content: "Import et vérification des rasters GeoTIFF et couches GeoJSON : CRS, emprise, résolution, NoData." },
       { property: "og:title", content: "Données géospatiales — GeoSim PSL" },
