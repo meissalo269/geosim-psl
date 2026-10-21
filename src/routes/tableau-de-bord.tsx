@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { ClientOnly } from "@tanstack/react-router";
+import { ClientOnly, useHydrated } from "@tanstack/react-router";
 import { ChartLegend, ChartPanel } from "@/components/geo/ChartPanel";
 import { Button } from "@/components/ui/button";
 import { MapView, type OverlayLayer } from "@/components/geo/MapView";
@@ -26,6 +26,7 @@ export const Route = createFileRoute("/tableau-de-bord")({
 });
 
 function Dashboard() {
+  const hydrated = useHydrated();
   const rasters = useRasters();
   const { classes, history } = useGeo();
   const colorOf = useClassColor();
@@ -38,17 +39,17 @@ function Dashboard() {
       const a = classAreas(r.raster);
       const row: Record<string, number | string> = { annee: String(r.year) };
       classes.forEach((c) => (row[c.name] = Math.round((a.get(c.code) ?? 0) * 10) / 10));
-      byYear.set(r.year!, row);
+      if (r.year !== null) byYear.set(r.year, row);
     });
     return [...byYear.entries()].sort((a, b) => a[0] - b[0]).map((e) => e[1]);
   }, [rasters, classes]);
 
-  const latest = rasters.filter((r) => r.year).sort((a, b) => b.year! - a.year!)[0];
+  const latest = rasters.filter((r) => r.year).sort((a, b) => (b.year ?? 0) - (a.year ?? 0))[0];
   const overlays: OverlayLayer[] = useMemo(() => {
-    if (!latest || typeof document === "undefined") return [];
+    if (!latest || !hydrated) return [];
     const b = wgs84Bounds(latest.raster);
     return b ? [{ id: latest.id, url: renderToDataUrl(latest.raster, colorOf), bounds: b, opacity: 0.75, visible: true }] : [];
-  }, [latest, colorOf]);
+  }, [latest, colorOf, hydrated]);
   const studyArea = useGeo((s) => s.datasets.find((d) => d.isStudyArea && d.geojson));
   const lastJob = history.find((h) => h.type !== "Import");
   const sims = history.filter((h) => h.type === "Simulation Markov").slice(0, 3);
@@ -77,7 +78,7 @@ function Dashboard() {
           <Panel title="Zone d'étude" className="xl:col-span-3">
             <div className="h-[420px] overflow-hidden rounded-sm">
               <ClientOnly fallback={<div className="grid-paper h-full" />}>
-                <MapView overlays={overlays} vectors={studyArea ? [{ id: studyArea.id, data: studyArea.geojson!, visible: true }] : []} fitTo={overlays[0]?.bounds ?? null} />
+                <MapView overlays={overlays} vectors={studyArea?.geojson ? [{ id: studyArea.id, data: studyArea.geojson, visible: true }] : []} fitTo={overlays[0]?.bounds ?? null} />
               </ClientOnly>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{latest ? `Couche affichée : ${latest.name}` : "Limites de la zone d'étude non importées."}</p>
