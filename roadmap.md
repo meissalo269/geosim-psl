@@ -1,3 +1,9 @@
+# Préparation académique pour GitHub
+- [ ] Auditer les technologies, la chaîne scientifique, les résultats disponibles et la confidentialité.
+- [ ] Rédiger le README universitaire et la documentation technique et scientifique en français.
+- [ ] Organiser un dossier de cartes, figures, tableaux et résultats avec traçabilité.
+- [ ] Vérifier les liens documentaires, la reproductibilité et les tests sans modifier les calculs.
+
 # Corrections GeoSim PSL
 - [x] Corriger les erreurs de calcul et les erreurs des pages identifiées.
 - [x] Exporter tous les graphiques en PNG et SVG avec contexte FICTIF.
