@@ -1,4 +1,5 @@
 # Préparation académique pour GitHub
+- [ ] Présenter les modifications proposées pour le module Classification & Machine Learning avant toute modification de l’architecture ; attendre l’accord sur le plan.
 - [ ] Auditer les technologies, la chaîne scientifique, les résultats disponibles et la confidentialité.
 - [ ] Rédiger le README universitaire et la documentation technique et scientifique en français.
 - [ ] Organiser un dossier de cartes, figures, tableaux et résultats avec traçabilité.
