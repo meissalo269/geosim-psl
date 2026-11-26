@@ -73,7 +73,6 @@ TypeScript/TSX, CSS, JSON/GeoJSON, Markdown, HTML, CSV et GeoTIFF sont les princ
 | URL | Fichier dans `src/routes/` | Rôle |
 |---|---|---|
 | `/` | `index.tsx` | Accueil cartographique scientifique |
-| `/tableau-de-bord` | `tableau-de-bord.tsx` | Statistiques de session ; peut inclure des prédictions |
 | `/donnees` | `donnees.tsx` | Import, métadonnées et chargement PSL |
 | `/carte` | `carte.tsx` | Consultation, couches, identification et comparaison |
 | `/analyse` | `analyse.tsx` | Matrices, changements, gains/pertes |

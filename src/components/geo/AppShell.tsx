@@ -2,11 +2,12 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { BookOpen, Database, FileDown, GitCompareArrows, History, Home, LayoutDashboard, Map, Menu, Moon, PanelLeftClose, PanelLeftOpen, Settings, ShieldCheck, Sparkles, Sun, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { loadPslInputs } from "@/lib/psl-inputs";
+import { useGeo } from "@/lib/store";
 import logo from "@/assets/geosim-logo-contours.png";
 
 const NAV = [
   { to: "/", label: "Accueil scientifique", icon: Home },
-  { to: "/tableau-de-bord", label: "Tableau de bord", icon: LayoutDashboard },
   { to: "/donnees", label: "Données géospatiales", icon: Database },
   { to: "/carte", label: "Explorateur cartographique", icon: Map },
   { to: "/analyse", label: "Analyse des changements", icon: GitCompareArrows },
@@ -23,6 +24,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [dark, setDark] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (useGeo.getState().datasets.some((d) => d.id.startsWith("psl-real-"))) return;
+    loadPslInputs().then((inputs) => inputs.forEach((d) => { const st = useGeo.getState(); if (!st.datasets.some((x) => x.id === d.id)) st.addDataset(d); })).catch(() => {});
+  }, []);
   useEffect(() => { setDark(window.matchMedia("(prefers-color-scheme: dark)").matches); }, []);
   useEffect(() => { document.documentElement.classList.toggle("dark", dark); }, [dark]);
   return <div className="flex min-h-screen">

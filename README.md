@@ -6,7 +6,7 @@ WebSIG scientifique de Port-Saint-Louis-du-Rhône, par Cheikh Ahmed Fadel Keita 
 
 Avec Bun installé, exécuter `bun install`, puis `bun run dev`. `bun run test` exécute les tests ; `bun run build` prépare la production.
 
-L’accueil propose le chargement des classifications PSL 2018, 2021 et 2024 et de la limite fournie. Le tableau de bord est accessible à `/tableau-de-bord`, les méthodes à `/documentation`. Les modules permettent les imports GeoTIFF/GeoJSON, l’analyse des changements, les simulations Markov et CA-Markov simplifié, la validation et les exports.
+Les classifications PSL 2018, 2021 et 2024 et la limite fournie se chargent automatiquement à l’ouverture du site. Les méthodes à `/documentation`. Les modules permettent les imports GeoTIFF/GeoJSON, l’analyse des changements, les simulations Markov et CA-Markov simplifié, la validation et les exports.
 
 Les données et résultats sont conservés en mémoire pendant la session, sans compte ni base de données. Les cartes de démonstration sont explicitement FICTIVES. Les résultats simulés ne sont pas utilisés comme observations historiques.
 

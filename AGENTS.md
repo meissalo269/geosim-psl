@@ -15,5 +15,5 @@
 - Graph exports use ChartPanel to capture their titles and fictitious-data context; GeoTIFF exports preserve the categorical signed-integer grid and original georeferencing.
 - Provided historical PSL rasters are pre-masked by pixel-centre inclusion in the supplied WGS84 study polygon; retain the original grid, assign exterior NoData, and serve fixed inputs through asset pointers so all analyses exclude the exterior consistently.
 
-- The index route is the scientific map-first introduction; the statistics dashboard lives at /tableau-de-bord so presentation and session-derived analysis remain separate.
+- The index route is the scientific map-first introduction; there is no dashboard page, and AppShell auto-loads the provided PSL rasters once so every page shows real data without a manual step.
 - Theme changes are applied after hydration by AppShell using semantic CSS variables; logo artwork uses a stable light surface for readability in both themes.
