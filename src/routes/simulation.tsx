@@ -69,7 +69,6 @@ function Simulation() {
       const warnings: string[] = [];
       if (!Number.isInteger(steps)) warnings.push("Quantités : interpolation entre deux pas. Carte : transition fractionnaire sur le dernier pas ; les deux méthodes peuvent différer.");
       if (ch.matrix.some((r) => r.every((v) => v === 0))) warnings.push("Classe absente à t1 : maintien de sa classe par défaut, faute de transitions observées.");
-      if (model === "ca-markov") warnings.push("CA-Markov simplifié : voisinage 3×3, poids 1 + proportion locale de la classe. Sans cartes d’aptitude, pente ou contraintes ; les probabilités et quantités sont modifiées par le voisinage.");
       const raster = await spatialMarkov(B.raster, codes, P, steps, model, seed, setProgress);
       const actual = classAreas(raster);
       const later = historical.find((r) => r.year && r.year > y2 && r.year <= target && checkCompatibility(B.raster, r.raster).every((i) => i.level !== "error"));
