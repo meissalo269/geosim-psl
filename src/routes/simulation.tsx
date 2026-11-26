@@ -1,7 +1,7 @@
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Download, Play, ServerOff } from "lucide-react";
+import { Download, Play } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +55,6 @@ function Simulation() {
   const interval = y1 && y2 ? y2 - y1 : 0;
   const steps = interval > 0 && y2 ? (target - y2) / interval : 0;
   if (steps > 100) errors.push("La projection est limitée à 100 pas de Markov.");
-  const far = steps > 2;
 
   async function run() {
     if (!A || !B || !y1 || !y2 || errors.length || busy || model === "ml") return;
@@ -68,7 +67,6 @@ function Simulation() {
       const start = codes.map((c) => startAreas.get(c) ?? 0);
       const predicted = projectMarkov(start, P, steps);
       const warnings: string[] = [];
-      if (far) warnings.push(`Extrapolation élevée : ${target - y2} ans pour ${interval} ans de calibration.`);
       if (!Number.isInteger(steps)) warnings.push("Quantités : interpolation entre deux pas. Carte : transition fractionnaire sur le dernier pas ; les deux méthodes peuvent différer.");
       if (ch.matrix.some((r) => r.every((v) => v === 0))) warnings.push("Classe absente à t1 : maintien de sa classe par défaut, faute de transitions observées.");
       if (model === "ca-markov") warnings.push("CA-Markov simplifié : voisinage 3×3, poids 1 + proportion locale de la classe. Sans cartes d’aptitude, pente ou contraintes ; les probabilités et quantités sont modifiées par le voisinage.");
@@ -92,11 +90,11 @@ function Simulation() {
       <RasterSelect label="Carte de calibration t1" value={A?.id ?? ""} onChange={setA} rasters={historical} />
       <RasterSelect label="Carte de calibration t2 (carte initiale)" value={B?.id ?? ""} onChange={setB} rasters={historical} />
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Année cible (max 2030)</span><Input type="number" min={2024} max={MAX_TARGET} value={target} onChange={(e) => setTarget(Number(e.target.value))} /></label>
-      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Modèle</span><select className="h-9 w-full rounded-md border border-input bg-card px-2" value={model} onChange={(e) => setModel(e.target.value as SpatialModel | "ml")}><option value="markov">Markov spatial stochastique</option><option value="ca-markov">CA-Markov simplifié (3×3)</option><option value="ml">Apprentissage automatique</option></select></label>
+      <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Modèle</span><select className="h-9 w-full rounded-md border border-input bg-card px-2" value={model} onChange={(e) => setModel(e.target.value as SpatialModel | "ml")}><option value="markov">Markov spatial stochastique</option><option value="ca-markov">CA-Markov simplifié (3×3)</option></select></label>
       <label className="text-sm"><span className="mb-1 block text-xs text-muted-foreground">Graine aléatoire</span><Input type="number" min={1} max={2147483646} value={seed} onChange={(e) => setSeed(Number(e.target.value))} /></label>
     </fieldset>
-    <div className="mt-4 space-y-2">{errors.map((e) => <Notice key={e} tone="error" title={e} />)}{far && !errors.length && <Notice title="Extrapolation élevée">Scénario tendanciel éloigné de la période de calibration.</Notice>}{failure && <Notice tone="error" title={failure} />}</div>
-    {model === "ml" ? <Notice title="Moteur de simulation non configuré"><ServerOff className="inline h-4 w-4" /> L’apprentissage automatique nécessite un modèle entraîné et des variables explicatives réelles.</Notice> : <Button className="mt-4" onClick={run} disabled={busy || !A || !B || errors.length > 0}><Play className="mr-1 h-4 w-4" />{busy ? `Calcul en cours… ${progress} %` : "Produire la carte prédite"}</Button>}
+    <div className="mt-4 space-y-2">{errors.map((e) => <Notice key={e} tone="error" title={e} />)}{failure && <Notice tone="error" title={failure} />}</div>
+    {<Button className="mt-4" onClick={run} disabled={busy || !A || !B || errors.length > 0}><Play className="mr-1 h-4 w-4" />{busy ? `Calcul en cours… ${progress} %` : "Produire la carte prédite"}</Button>}
     </Panel>{sim && <SimResult s={sim} />}
   </div></div>;
 }
