@@ -20,16 +20,6 @@ export const Route = createFileRoute("/parametres")({
   component: Settings,
 });
 
-const ENDPOINTS = [
-  ["POST", "/datasets", "Enregistrer un jeu de données"],
-  ["POST", "/datasets/validate", "Contrôler métadonnées et compatibilité"],
-  ["POST", "/analysis/change", "Analyser les changements (gros rasters)"],
-  ["POST", "/simulation/run", "Lancer une simulation CA-Markov / ML"],
-  ["POST", "/validation/run", "Évaluer une carte prédite"],
-  ["GET", "/jobs/{id}", "État : en attente, en cours, terminé, erreur"],
-  ["GET", "/results/{id}", "Résultats d'un traitement terminé"],
-];
-
 function Settings() {
   const { classes, setClasses, years, addYear } = useGeo();
   const [y, setY] = useState("");
@@ -59,9 +49,8 @@ function Settings() {
           <div className="mb-3 flex flex-wrap gap-2">{years.map((x) => <span key={x} className="stat-num rounded bg-secondary px-2 py-1 text-sm">{x}</span>)}</div>
           <div className="flex gap-2"><Input type="number" placeholder="ex. 2015" value={y} onChange={(e) => setY(e.target.value)} className="w-32" /><Button variant="outline" onClick={() => { if (y) { addYear(Number(y)); setY(""); } }}>Ajouter</Button></div>
         </Panel>
-        <Panel title="Moteur de traitement Python" className="xl:col-span-2">
-          <Notice title="Non configuré">Les traitements lourds (alignement, reprojection, CA-Markov avec aptitudes, apprentissage automatique) nécessitent une API FastAPI externe (Rasterio, GDAL, GeoPandas, NumPy, SciPy, scikit-learn) avec file de tâches. Markov spatial, CA-Markov simplifié et exports GeoTIFF sont disponibles localement. Endpoints spécifiés :</Notice>
-          <table className="stat-num mt-3 w-full text-xs">{/* spec */}<tbody>{ENDPOINTS.map(([m, p, d]) => <tr key={p} className="border-t border-border"><td className="py-1.5 font-semibold text-accent">{m}</td><td>{p}</td><td className="font-sans text-muted-foreground">{d}</td></tr>)}</tbody></table>
+        <Panel title="Traitements disponibles" className="xl:col-span-2">
+          <ul className="list-disc space-y-1 pl-5 text-sm"><li>Matrices de transition et probabilités de Markov</li><li>Markov spatial stochastique</li><li>CA-Markov simplifié (voisinage 3×3)</li><li>Exports GeoTIFF, CSV et graphiques</li></ul>
         </Panel>
       </div>
     </div>
